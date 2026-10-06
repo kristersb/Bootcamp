@@ -1,0 +1,29 @@
+.confirm-card {
+  max-width: 440px;
+  margin-top: 8vh;
+}
+
+.confirm-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.confirm-message {
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.confirm-message p {
+  margin: 0 0 0.5rem;
+}
+
+.confirm-list {
+  margin: 0 0 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.btn-primary.btn-danger-solid {
+  background: #b3261e;
+  color: #fff;
+}

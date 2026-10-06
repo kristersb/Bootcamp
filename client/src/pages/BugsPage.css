@@ -1,0 +1,10 @@
+.bug-filters select {
+  min-width: 9rem;
+}
+
+.bug-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

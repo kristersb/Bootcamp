@@ -1,0 +1,116 @@
+import { useEffect, useState } from 'react'
+import { SUITE_STATUSES } from '../constants/test-suite'
+import { createTestSuite, updateTestSuite } from '../api/test-suites'
+import { useSingleFlight } from '../hooks/use-single-flight'
+import './TestCaseFormModal.css'
+
+function TestSuiteFormModal({ suite, onClose, onSaved }) {
+  const isEdit = Boolean(suite)
+  const [name, setName] = useState(suite?.name ?? '')
+  const [feature, setFeature] = useState(suite?.feature ?? '')
+  const [status, setStatus] = useState(suite?.status ?? 'draft')
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const runOnce = useSingleFlight()
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setSubmitError('')
+
+    const errors = {}
+    if (!name.trim()) errors.name = 'Name is required.'
+    if (!feature.trim()) errors.feature = 'Feature is required.'
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
+    const payload = { name: name.trim(), feature: feature.trim(), status }
+
+    await runOnce(async () => {
+      setSaving(true)
+      try {
+        const saved = isEdit ? await updateTestSuite(suite.id, payload) : await createTestSuite(payload)
+        onSaved(saved)
+        onClose()
+      } catch (err) {
+        setSubmitError(err.message)
+      } finally {
+        setSaving(false)
+      }
+    })
+  }
+
+  return (
+    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="suite-form-title">
+        <div className="modal-header">
+          <h2 id="suite-form-title">{isEdit ? 'Edit Test Suite' : 'New Test Suite'}</h2>
+          <button type="button" className="modal-close" aria-label="Close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} noValidate>
+          <label className="field">
+            <span>Name *</span>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Login regression"
+              autoFocus
+            />
+            {fieldErrors.name && <span className="field-error">{fieldErrors.name}</span>}
+          </label>
+
+          <label className="field">
+            <span>Feature *</span>
+            <input
+              type="text"
+              value={feature}
+              onChange={(e) => setFeature(e.target.value)}
+              placeholder="What this suite tests, e.g. login"
+            />
+            {fieldErrors.feature && <span className="field-error">{fieldErrors.feature}</span>}
+          </label>
+
+          <label className="field">
+            <span>Status *</span>
+            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+              {SUITE_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {submitError && (
+            <p className="form-error" role="alert">
+              {submitError}
+            </p>
+          )}
+
+          <div className="modal-actions">
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Suite'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+export default TestSuiteFormModal

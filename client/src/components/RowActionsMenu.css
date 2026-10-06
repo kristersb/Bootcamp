@@ -1,0 +1,58 @@
+.row-actions {
+  position: relative;
+  display: inline-block;
+}
+
+.row-actions-trigger {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.row-actions-trigger:hover {
+  background: light-dark(#eee, #333);
+}
+
+.row-actions-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+  background: light-dark(#fff, #222);
+  border: 1px solid light-dark(#ddd, #444);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 100px;
+  overflow: hidden;
+}
+
+.row-actions-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.row-actions-menu button:hover,
+.row-actions-menu button:focus-visible {
+  background: light-dark(#f2f2f2, #333);
+}
+
+.row-actions-trigger:focus-visible,
+.row-actions-menu button:focus-visible {
+  outline: 2px solid #1b4f8c;
+  outline-offset: -2px;
+}
+
+.row-actions-menu button.danger {
+  color: light-dark(#b3261e, #ff8a80);
+}

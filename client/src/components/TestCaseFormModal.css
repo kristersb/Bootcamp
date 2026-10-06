@@ -1,0 +1,166 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1rem;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.modal-card {
+  background: light-dark(#fff, #1e1e1e);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 520px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+  color: inherit;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.field span {
+  font-weight: 600;
+}
+
+.field input,
+.field textarea,
+.field select {
+  font: inherit;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid light-dark(#ccc, #444);
+  background: light-dark(#fff, #2a2a2a);
+  color: inherit;
+}
+
+.field-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.field-row .field {
+  flex: 1;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.step-number {
+  min-width: 1.2rem;
+  font-weight: 600;
+}
+
+.list-row input {
+  flex: 1;
+}
+
+.list-remove {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.list-remove:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.add-list-item {
+  background: none;
+  border: 1px dashed light-dark(#bbb, #555);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  color: inherit;
+  font-size: 0.85rem;
+  align-self: flex-start;
+}
+
+.field-error {
+  color: light-dark(#b3261e, #ff8a80);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.form-error {
+  color: light-dark(#b3261e, #ff8a80);
+  font-size: 0.85rem;
+  margin: -0.4rem 0 1rem;
+}
+
+.field > label {
+  font-weight: 600;
+}
+
+.add-list-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: #1b4f8c;
+  color: #fff;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: none;
+  border-color: light-dark(#ccc, #555);
+  color: inherit;
+}

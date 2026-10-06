@@ -1,0 +1,226 @@
+.test-cases-page {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  font-family: system-ui, sans-serif;
+}
+
+.test-cases-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.test-cases-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.test-cases-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.test-cases-toolbar input[type='search'] {
+  flex: 1;
+  min-width: 10rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid light-dark(#ccc, #444);
+  background: light-dark(#fff, #2a2a2a);
+  color: inherit;
+  font: inherit;
+}
+
+.test-cases-toolbar select {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid light-dark(#ccc, #444);
+  background: light-dark(#fff, #2a2a2a);
+  color: inherit;
+  font: inherit;
+}
+
+/* Fixed layout: column widths come from the <colgroup>, never from the cell text, so a long title
+   wraps inside its own column instead of moving the other columns. */
+.test-cases-table {
+  width: 100%;
+  min-width: 48rem;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.col-severity {
+  width: 7rem;
+}
+
+.col-priority {
+  width: 6.5rem;
+}
+
+.col-status {
+  width: 8rem;
+}
+
+.col-feature {
+  width: 9rem;
+}
+
+.col-count {
+  width: 5rem;
+}
+
+.col-date {
+  width: 11.5rem;
+}
+
+.col-actions {
+  width: 3.5rem;
+}
+
+.table-scroll {
+  position: relative; /* keeps the visually-hidden header text inside the scroll box */
+  overflow-x: auto;
+}
+
+.test-cases-table th,
+.test-cases-table td {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid light-dark(#eee, #333);
+  overflow-wrap: anywhere;
+}
+
+.test-cases-table.is-loading {
+  opacity: 0.6;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sort-button:hover {
+  text-decoration: underline;
+}
+
+.sort-button:focus-visible,
+.link-button:focus-visible,
+.notice-dismiss:focus-visible {
+  outline: 2px solid #1b4f8c;
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  background: light-dark(#e6f4ea, #1f3326);
+  color: light-dark(#14532d, #b7e4c7);
+  font-size: 0.9rem;
+}
+
+.notice-dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.list-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  background: light-dark(#fdecea, #3a1f1d);
+  color: light-dark(#8f1e17, #ffb4ab);
+  font-size: 0.9rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.status-pill {
+  text-transform: capitalize;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: light-dark(#eee, #333);
+  font-size: 0.8rem;
+}
+
+.actions-cell {
+  text-align: right;
+  width: 2rem;
+}
+
+.empty-row {
+  text-align: center;
+  opacity: 0.6;
+  padding: 2rem 0;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.pagination button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid light-dark(#ccc, #555);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.form-error {
+  color: light-dark(#b3261e, #ff8a80);
+  font-size: 0.85rem;
+}

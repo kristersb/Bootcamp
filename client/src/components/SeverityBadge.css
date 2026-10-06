@@ -1,0 +1,28 @@
+.severity-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.severity-critical {
+  background: #fde2e1;
+  color: #8f1e17;
+}
+
+.severity-major {
+  background: #ffe9cf;
+  color: #8a4b05;
+}
+
+.severity-minor {
+  background: #fff6cf;
+  color: #7a6304;
+}
+
+.severity-trivial {
+  background: #e4f0ff;
+  color: #1b4f8c;
+}
