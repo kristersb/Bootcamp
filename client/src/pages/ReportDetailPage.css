@@ -1,0 +1,17 @@
+.report-results-table .col-num {
+  width: 3rem;
+}
+
+.report-results-table .col-result {
+  width: 7rem;
+}
+
+.report-results-table .col-duration {
+  width: 6rem;
+}
+
+@media print {
+  .report-results-table {
+    min-width: 0;
+  }
+}

@@ -1,8 +1,18 @@
-const express = require('express')
+const fs = require('fs')
 const path = require('path')
+
+// Load .env before anything reads the environment. Variables already set in the shell win over the file.
+const envFile = path.join(__dirname, '..', '.env')
+if (fs.existsSync(envFile)) process.loadEnvFile(envFile)
+
+const express = require('express')
 const testCasesRouter = require('./routes/testCases')
 const testSuitesRouter = require('./routes/test-suites')
 const bugsRouter = require('./routes/bugs')
+const testRunsRouter = require('./routes/test-runs')
+const dashboardRouter = require('./routes/dashboard')
+const reportsRouter = require('./routes/reports')
+const { handleRequestError } = require('./error-handler')
 
 const app = express()
 const PORT = process.env.SERVER_PORT || 3001
@@ -16,6 +26,9 @@ app.get('/api/hello', (req, res) => {
 app.use('/api/test-cases', testCasesRouter)
 app.use('/api/test-suites', testSuitesRouter)
 app.use('/api/bugs', bugsRouter)
+app.use('/api/test-runs', testRunsRouter)
+app.use('/api/dashboard', dashboardRouter)
+app.use('/api/reports', reportsRouter)
 
 app.use('/api', (req, res) => {
   res.status(404).json({ success: false, data: null, error: 'API route not found' })
@@ -27,32 +40,7 @@ app.use((req, res) => {
   res.sendFile(path.join(clientDist, 'index.html'))
 })
 
-// Keeps every failure inside the {success, data, error} shape instead of Express's HTML error page.
-function handleRequestError(err, req, res, next) {
-  if (res.headersSent) return next(err)
-
-  let status = err.status || err.statusCode || 500
-  let message
-
-  if (err.type === 'entity.parse.failed') {
-    status = 400
-    message = 'The request body is not valid JSON.'
-  } else if (err.type === 'entity.too.large') {
-    status = 413
-    message = 'The request body is too large.'
-  } else if (status === 404) {
-    message = 'Not found.'
-  } else if (status >= 400 && status < 500) {
-    message = 'The request could not be processed.'
-  } else {
-    console.error(err)
-    status = 500
-    message = 'Something went wrong on the server. Try again.'
-  }
-
-  res.status(status).json({ success: false, data: null, error: message })
-}
-
+// Must be registered last, after every route and middleware.
 app.use(handleRequestError)
 
 const server = app.listen(PORT, () => {

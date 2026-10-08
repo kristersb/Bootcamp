@@ -9,3 +9,6 @@ server/data.sqlite-*
 .vite/
 coverage/
 .claude/settings.local.json
+
+# Auto-generated daily work logs
+.claude/logs/

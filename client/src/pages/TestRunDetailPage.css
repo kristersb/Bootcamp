@@ -1,0 +1,171 @@
+.run-number-title {
+  font-size: 0.9rem;
+  font-weight: 400;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.run-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.run-case-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-case {
+  margin-bottom: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid light-dark(#ddd, #3a3a3a);
+  border-radius: 8px;
+  background: light-dark(#fff, #222);
+  font-size: 0.9rem;
+}
+
+.run-case-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.run-case-head .case-title {
+  flex: 1;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.result-pill {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: light-dark(#eee, #333);
+}
+
+.result-passed {
+  background: light-dark(#dcf3e3, #1f3a2a);
+  color: light-dark(#14532d, #b7e4c7);
+}
+
+.result-failed {
+  background: light-dark(#fde2e1, #4a2321);
+  color: light-dark(#8f1e17, #ffb4ab);
+}
+
+.result-skipped {
+  background: light-dark(#e6e6e6, #3a3a3a);
+}
+
+.result-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.result-button {
+  min-width: 4.5rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid light-dark(#bbb, #555);
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.result-button:hover:not(:disabled) {
+  background: light-dark(#f2f2f2, #333);
+}
+
+.result-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.result-button[aria-pressed='true'] {
+  font-weight: 700;
+  border-width: 2px;
+}
+
+.result-button-passed[aria-pressed='true'] {
+  background: light-dark(#dcf3e3, #1f3a2a);
+  border-color: light-dark(#2e7d4f, #6fcf97);
+}
+
+.result-button-failed[aria-pressed='true'] {
+  background: light-dark(#fde2e1, #4a2321);
+  border-color: light-dark(#b3261e, #ff8a80);
+}
+
+.result-button-skipped[aria-pressed='true'] {
+  background: light-dark(#e6e6e6, #3a3a3a);
+  border-color: light-dark(#777, #aaa);
+}
+
+.result-button:focus-visible {
+  outline: 2px solid #1b4f8c;
+  outline-offset: 2px;
+}
+
+.run-case-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.run-case-fields .field {
+  margin-bottom: 0;
+}
+
+.run-notes {
+  flex: 1;
+  min-width: 14rem;
+}
+
+.run-seconds {
+  width: 9rem;
+}
+
+.alert-line {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.run-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid light-dark(#ddd, #3a3a3a);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.run-banner p {
+  margin: 0;
+}
+
+.run-ready {
+  border-color: light-dark(#7bc496, #2f6b45);
+  background: light-dark(#eefaf2, #1b2c22);
+}
+
+.run-locked {
+  background: light-dark(#f1f1f1, #2a2a2a);
+}
+
+.run-case-locked {
+  opacity: 0.9;
+}

@@ -7,6 +7,8 @@ import {
   removeCaseFromTestSuite,
   reorderTestSuiteCases,
 } from '../api/test-suites'
+import { createTestRun } from '../api/test-runs'
+import { useSingleFlight } from '../hooks/use-single-flight'
 import { formatDate } from '../utils/format-date'
 import ConfirmDialog from '../components/ConfirmDialog'
 import SeverityBadge from '../components/SeverityBadge'
@@ -31,6 +33,8 @@ function TestSuiteDetailPage() {
   const [dragIndex, setDragIndex] = useState(null)
   const [overIndex, setOverIndex] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [startingRun, setStartingRun] = useState(false)
+  const runOnce = useSingleFlight()
   const savingRef = useRef(false)
 
   const load = useCallback(() => {
@@ -99,6 +103,21 @@ function TestSuiteDetailPage() {
     setSuite(await withSaveLock(() => addCaseToTestSuite(suite.id, testCaseId)))
   }
 
+  // The server copies the suite's cases at this moment, so the run is correct even if this page is out of date.
+  async function handleNewRun() {
+    await runOnce(async () => {
+      setStartingRun(true)
+      setError('')
+      try {
+        const run = await createTestRun({ suite_id: suite.id })
+        navigate(`/test-runs/${run.id}`)
+      } catch (err) {
+        setError(`Could not start a run: ${err.message}`)
+        setStartingRun(false)
+      }
+    })
+  }
+
   async function confirmDelete() {
     setDeleting(true)
     setDeleteError('')
@@ -147,6 +166,15 @@ function TestSuiteDetailPage() {
           </p>
         </div>
         <div className="suite-actions">
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={startingRun || suite.cases.length === 0}
+            title={suite.cases.length === 0 ? 'Add test cases to this suite before starting a run' : undefined}
+            onClick={handleNewRun}
+          >
+            {startingRun ? 'Starting...' : 'New Run'}
+          </button>
           <button type="button" className="btn-secondary" onClick={() => setShowEdit(true)}>
             Edit
           </button>

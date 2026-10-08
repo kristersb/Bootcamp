@@ -1,7 +1,8 @@
 const path = require('path')
 const Database = require('better-sqlite3')
 
-const db = new Database(path.join(__dirname, 'data.sqlite'))
+// DATABASE_PATH lets tests run against a throwaway file instead of the real data.
+const db = new Database(process.env.DATABASE_PATH || path.join(__dirname, 'data.sqlite'))
 
 db.pragma('journal_mode = WAL')
 
@@ -323,6 +324,178 @@ if (!db.prepare("SELECT 1 FROM app_meta WHERE key = 'bugs_seeded'").get()) {
     }
 
     db.prepare("INSERT INTO app_meta (key, value) VALUES ('bugs_seeded', '1')").run()
+  })()
+}
+
+// A run is a historical record: it keeps its own copy of the suite name and each case title, so renaming or
+// deleting the suite or a test case later does not rewrite what was run. "result" is NULL until a case is recorded.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS test_runs_v2 (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    suite_id INTEGER REFERENCES test_suites(id) ON DELETE SET NULL,
+    suite_name TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('in-progress', 'passed', 'failed')) DEFAULT 'in-progress',
+    pass_count INTEGER NOT NULL DEFAULT 0,
+    fail_count INTEGER NOT NULL DEFAULT 0,
+    skip_count INTEGER NOT NULL DEFAULT 0,
+    start_time TEXT NOT NULL DEFAULT (datetime('now')),
+    end_time TEXT,
+    locked_at TEXT,
+    created_by TEXT NOT NULL DEFAULT 'anonymous'
+  );
+
+  CREATE TABLE IF NOT EXISTS test_run_results (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES test_runs_v2(id) ON DELETE CASCADE,
+    test_case_id INTEGER REFERENCES test_cases(id) ON DELETE SET NULL,
+    case_title TEXT NOT NULL,
+    sort_order INTEGER NOT NULL,
+    result TEXT CHECK (result IN ('passed', 'failed', 'skipped')),
+    duration_ms INTEGER CHECK (duration_ms IS NULL OR duration_ms >= 0),
+    notes TEXT NOT NULL DEFAULT '',
+    failed_at TEXT,
+    alert_sent INTEGER NOT NULL DEFAULT 0 CHECK (alert_sent IN (0, 1)),
+    alert_sent_at TEXT,
+    alert_error TEXT,
+    recorded_at TEXT,
+    UNIQUE (run_id, sort_order)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_test_run_results_run ON test_run_results (run_id, sort_order);
+  CREATE INDEX IF NOT EXISTS idx_test_runs_start ON test_runs_v2 (start_time);
+`)
+
+// A run is only finished when someone completes it, which sets locked_at and freezes the results.
+// Runs from before this existed finished by themselves, so they are put back to "in-progress" with every outcome
+// still recorded. They are not locked on anyone's behalf: the person completes them with the usual confirmation.
+if (!db.prepare('PRAGMA table_info(test_runs_v2)').all().some((column) => column.name === 'locked_at')) {
+  db.transaction(() => {
+    db.exec('ALTER TABLE test_runs_v2 ADD COLUMN locked_at TEXT')
+    db.exec("UPDATE test_runs_v2 SET status = 'in-progress', end_time = NULL WHERE status != 'in-progress'")
+  })()
+}
+
+// Seeds one demo run exactly once, from the example "Login regression" suite. Every case already has an outcome,
+// so it is ready to be completed. Nothing is sent to Discord when seeding: the failed row records that no alert went out.
+if (!db.prepare("SELECT 1 FROM app_meta WHERE key = 'test_runs_seeded'").get()) {
+  db.transaction(() => {
+    const suite = db.prepare("SELECT id, name FROM test_suites WHERE name = 'Login regression' ORDER BY id LIMIT 1").get()
+    const cases = suite
+      ? db
+          .prepare(
+            `SELECT t.id, t.title, c.sort_order
+             FROM test_suite_cases c JOIN test_cases t ON t.id = c.test_case_id
+             WHERE c.suite_id = ? ORDER BY c.sort_order ASC`
+          )
+          .all(suite.id)
+      : []
+
+    if (cases.length >= 3) {
+      const demo = [
+        { result: 'passed', duration: 1800, notes: 'Logged in and landed on the dashboard.', minutesAfterStart: 6 },
+        {
+          result: 'failed',
+          duration: 94500,
+          notes: 'The account was not locked after the 5th wrong password. The 6th attempt with the correct password logged in.',
+          minutesAfterStart: 17,
+        },
+        { result: 'skipped', duration: null, notes: 'The email service is down in the test environment.', minutesAfterStart: 18 },
+      ]
+      const start = Date.now() - 3 * 3600 * 1000
+      const stamp = (minutes) => new Date(start + minutes * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ')
+
+      const runId = db
+        .prepare(
+          `INSERT INTO test_runs_v2 (suite_id, suite_name, status, pass_count, fail_count, skip_count, start_time, created_by)
+           VALUES (?, ?, 'in-progress', 1, 1, 1, ?, 'demo seed')`
+        )
+        .run(suite.id, suite.name, stamp(0)).lastInsertRowid
+
+      const insertResult = db.prepare(
+        `INSERT INTO test_run_results (run_id, test_case_id, case_title, sort_order, result, duration_ms, notes, failed_at, recorded_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      cases.slice(0, 3).forEach((testCase, index) => {
+        const entry = demo[index]
+        const when = stamp(entry.minutesAfterStart)
+        insertResult.run(
+          runId,
+          testCase.id,
+          testCase.title,
+          index + 1,
+          entry.result,
+          entry.duration,
+          entry.notes,
+          entry.result === 'failed' ? when : null,
+          when
+        )
+      })
+    }
+
+    db.prepare("INSERT INTO app_meta (key, value) VALUES ('test_runs_seeded', '1')").run()
+  })()
+}
+
+// A report is a frozen snapshot of a run: its counts and per-case results are copied in at generation time, so a
+// later change to the run (or its deletion) never alters a report that was already generated from it.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES test_runs_v2(id) ON DELETE CASCADE,
+    suite_name TEXT NOT NULL,
+    run_date TEXT NOT NULL,
+    total_count INTEGER NOT NULL,
+    passed_count INTEGER NOT NULL,
+    failed_count INTEGER NOT NULL,
+    skipped_count INTEGER NOT NULL,
+    results TEXT NOT NULL,
+    created_by TEXT,
+    generated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_reports_generated ON reports (generated_at);
+`)
+
+// Carries over who ran the test, for the export's header. Existing reports (created before this column existed)
+// are backfilled from their run; a run that was since deleted leaves it NULL, which the export shows as "—".
+if (!db.prepare('PRAGMA table_info(reports)').all().some((column) => column.name === 'created_by')) {
+  db.transaction(() => {
+    db.exec('ALTER TABLE reports ADD COLUMN created_by TEXT')
+    db.exec(`
+      UPDATE reports
+      SET created_by = (SELECT created_by FROM test_runs_v2 WHERE test_runs_v2.id = reports.run_id)
+      WHERE created_by IS NULL
+    `)
+  })()
+}
+
+// Seeds one demo report from the demo run above, exactly once.
+if (!db.prepare("SELECT 1 FROM app_meta WHERE key = 'reports_seeded'").get()) {
+  db.transaction(() => {
+    const run = db.prepare("SELECT * FROM test_runs_v2 WHERE created_by = 'demo seed' ORDER BY id DESC LIMIT 1").get()
+
+    if (run) {
+      const results = db
+        .prepare('SELECT case_title, result, duration_ms, notes FROM test_run_results WHERE run_id = ? ORDER BY sort_order ASC')
+        .all(run.id)
+
+      db.prepare(
+        `INSERT INTO reports (run_id, suite_name, run_date, total_count, passed_count, failed_count, skipped_count, results, created_by)
+         VALUES (@runId, @suiteName, @runDate, @total, @passed, @failed, @skipped, @results, @createdBy)`
+      ).run({
+        runId: run.id,
+        suiteName: run.suite_name,
+        runDate: run.start_time,
+        total: results.length,
+        passed: run.pass_count,
+        failed: run.fail_count,
+        skipped: run.skip_count,
+        results: JSON.stringify(results),
+        createdBy: run.created_by,
+      })
+    }
+
+    db.prepare("INSERT INTO app_meta (key, value) VALUES ('reports_seeded', '1')").run()
   })()
 }
 

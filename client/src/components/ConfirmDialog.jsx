@@ -2,7 +2,17 @@ import { useEffect, useRef } from 'react'
 import './TestCaseFormModal.css'
 import './ConfirmDialog.css'
 
-function ConfirmDialog({ title, children, confirmLabel = 'Delete', busy = false, error = '', onConfirm, onCancel }) {
+function ConfirmDialog({
+  title,
+  children,
+  confirmLabel = 'Delete',
+  busyLabel = 'Deleting...',
+  danger = true,
+  busy = false,
+  error = '',
+  onConfirm,
+  onCancel,
+}) {
   const dialogRef = useRef(null)
   const cancelRef = useRef(null)
 
@@ -67,8 +77,13 @@ function ConfirmDialog({ title, children, confirmLabel = 'Delete', busy = false,
           <button type="button" className="btn-secondary" ref={cancelRef} disabled={busy} onClick={onCancel}>
             Cancel
           </button>
-          <button type="button" className="btn-primary btn-danger-solid" disabled={busy} onClick={onConfirm}>
-            {busy ? 'Deleting...' : confirmLabel}
+          <button
+            type="button"
+            className={danger ? 'btn-primary btn-danger-solid' : 'btn-primary'}
+            disabled={busy}
+            onClick={onConfirm}
+          >
+            {busy ? busyLabel : confirmLabel}
           </button>
         </div>
       </div>
