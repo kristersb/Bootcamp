@@ -57,7 +57,7 @@ function ReportsPage() {
       )}
 
       <div className="table-scroll">
-        <table className={`test-cases-table runs-table${loading && items.length > 0 ? ' is-loading' : ''}`} aria-busy={loading}>
+        <table className={`test-cases-table${loading && items.length > 0 ? ' is-loading' : ''}`} aria-busy={loading}>
           <caption className="visually-hidden">Reports</caption>
           <colgroup>
             <col />
