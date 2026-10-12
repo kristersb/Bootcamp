@@ -21,6 +21,17 @@ function buildFailureAlert({ runId, suiteName, caseTitle, notes }) {
   return { content: lines.join('\n'), allowed_mentions: { parse: [] } }
 }
 
+// Sent once per time a case's score crosses the flaky threshold (see server/flakiness.js), not on every
+// update to an already-flaky case - that would resend on every single click of a case already sitting at 100%.
+function buildFlakyAlert({ caseTitle, score, transitions, qualifyingCount }) {
+  const lines = [
+    `:arrows_counterclockwise: **Test is flaky:** ${truncate(caseTitle, 200)}`,
+    `**Flakiness score:** ${score}% (${transitions} pass/fail flip${transitions === 1 ? '' : 's'} across the last ${qualifyingCount} results)`,
+    `**Details:** ${appBaseUrl()}/flaky-tests`,
+  ]
+  return { content: lines.join('\n'), allowed_mentions: { parse: [] } }
+}
+
 // Never returns or logs the webhook URL: it is a secret, and error messages from fetch can contain it.
 async function sendDiscordMessage(payload) {
   const url = process.env.DISCORD_WEBHOOK_URL
@@ -43,4 +54,4 @@ async function sendDiscordMessage(payload) {
   }
 }
 
-module.exports = { buildFailureAlert, sendDiscordMessage }
+module.exports = { buildFailureAlert, buildFlakyAlert, sendDiscordMessage }

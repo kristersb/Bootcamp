@@ -1,7 +1,8 @@
 const express = require('express')
 const db = require('../db')
 const { asyncHandler } = require('../async-handler')
-const { buildFailureAlert, sendDiscordMessage } = require('../discord')
+const { buildFailureAlert, buildFlakyAlert, sendDiscordMessage } = require('../discord')
+const { getCaseFlakiness, FLAKY_ALERT_THRESHOLD } = require('../flakiness')
 
 const router = express.Router()
 
@@ -19,6 +20,9 @@ const LIMITS = {
 
 // Results whose Discord alert is being sent right now, so two overlapping requests cannot send it twice.
 const alertsInFlight = new Set()
+// Same purpose as alertsInFlight, but keyed by test_case_id instead of result_id: flakiness is a property of
+// the case across all its runs, not of one result row.
+const flakyAlertsInFlight = new Set()
 
 const RUN_WITH_TOTAL_SQL = `
   SELECT r.*, (SELECT COUNT(*) FROM test_run_results WHERE run_id = r.id) AS total_count
@@ -240,6 +244,7 @@ async function handleUpdateTestRunResult(req, res) {
       row: db.prepare('SELECT * FROM test_run_results WHERE id = ?').get(row.id),
       needsAlert: fields.result === 'failed' && alertSent === 0,
       alreadySent: fields.result === 'failed' && alertSent === 1,
+      resultChanged,
     }
   })()
 
@@ -277,7 +282,46 @@ async function handleUpdateTestRunResult(req, res) {
     }
   }
 
-  return sendSuccess(res, { ...buildRunDetail(runId), alert: { result_id: resultId, ...alert } })
+  // The flaky-test alert is independent of the failure alert above - both can fire off the same update (a 4th
+  // failure can be both a fresh "test failed" alert and the one that flips the case to 100% flaky).
+  let flakyAlert = { status: 'not_applicable' }
+  const testCaseId = outcome.row.test_case_id
+
+  if (outcome.resultChanged && testCaseId) {
+    const flakiness = getCaseFlakiness(testCaseId)
+
+    if (flakiness?.eligible) {
+      const insight = db.prepare('SELECT flaky_alert_sent FROM flaky_test_insights WHERE test_case_id = ?').get(testCaseId)
+      const alreadySent = insight?.flaky_alert_sent === 1
+
+      if (flakiness.score >= FLAKY_ALERT_THRESHOLD && alreadySent) {
+        flakyAlert = { status: 'already_sent' }
+      } else if (flakiness.score >= FLAKY_ALERT_THRESHOLD && !alreadySent) {
+        if (flakyAlertsInFlight.has(testCaseId)) {
+          flakyAlert = { status: 'in_flight' }
+        } else {
+          flakyAlertsInFlight.add(testCaseId)
+          try {
+            const sent = await sendDiscordMessage(buildFlakyAlert(flakiness))
+            db.prepare('INSERT OR IGNORE INTO flaky_test_insights (test_case_id) VALUES (?)').run(testCaseId)
+            db.prepare(
+              'UPDATE flaky_test_insights SET flaky_alert_sent = ?, flaky_alert_sent_at = ?, flaky_alert_score = ? WHERE test_case_id = ?'
+            ).run(sent.sent ? 1 : 0, sent.sent ? sqlNow() : null, flakiness.score, testCaseId)
+            flakyAlert = sent.sent ? { status: 'sent' } : { status: 'failed', error: sent.error }
+          } finally {
+            flakyAlertsInFlight.delete(testCaseId)
+          }
+        }
+      } else if (flakiness.score < FLAKY_ALERT_THRESHOLD && alreadySent) {
+        // Score dropped back below the threshold: re-arm, so a future re-crossing alerts again.
+        db.prepare('UPDATE flaky_test_insights SET flaky_alert_sent = 0, flaky_alert_sent_at = NULL WHERE test_case_id = ?').run(
+          testCaseId
+        )
+      }
+    }
+  }
+
+  return sendSuccess(res, { ...buildRunDetail(runId), alert: { result_id: resultId, ...alert }, flaky_alert: flakyAlert })
 }
 
 // Completing a run locks its results for good. Allowed only once every case has an outcome. The caller may send the
