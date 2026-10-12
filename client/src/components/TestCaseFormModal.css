@@ -11,8 +11,8 @@
 }
 
 .modal-card {
-  background: light-dark(#fff, #1e1e1e);
-  border-radius: 10px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 520px;
   padding: 1.5rem;
@@ -143,15 +143,22 @@
 .btn-primary,
 .btn-secondary {
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font: inherit;
+  font-weight: 600;
   border: 1px solid transparent;
 }
 
 .btn-primary {
-  background: #1b4f8c;
-  color: #fff;
+  background: var(--color-accent-solid);
+  color: var(--color-accent-solid-text);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 .btn-primary:disabled {
@@ -160,7 +167,7 @@
 }
 
 .btn-secondary {
-  background: none;
-  border-color: light-dark(#ccc, #555);
-  color: inherit;
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }

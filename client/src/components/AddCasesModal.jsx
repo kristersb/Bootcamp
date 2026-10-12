@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { listTestCases } from '../api/testCases'
+import { useDialog } from '../hooks/use-dialog'
 import SeverityBadge from './SeverityBadge'
 import './TestCaseFormModal.css'
 import './AddCasesModal.css'
@@ -13,13 +14,12 @@ function AddCasesModal({ existingIds, busy = false, onAdd, onClose }) {
   const [error, setError] = useState('')
   const [addingId, setAddingId] = useState(null)
 
-  useEffect(() => {
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  const dialogRef = useRef(null)
+  const searchInputRef = useRef(null)
+
+  // Same focus trap, initial focus and Escape-to-close every other modal in this app gets; this one had only
+  // a bare Escape listener, so Tab could previously walk focus out of the dialog and into the page behind it.
+  useDialog({ dialogRef, initialFocusRef: searchInputRef, onRequestClose: onClose })
 
   useEffect(() => {
     const timeout = setTimeout(() => setSearch(searchInput), 300)
@@ -60,7 +60,7 @@ function AddCasesModal({ existingIds, busy = false, onAdd, onClose }) {
 
   return (
     <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-card wide" role="dialog" aria-modal="true" aria-labelledby="add-cases-title">
+      <div className="modal-card wide" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="add-cases-title">
         <div className="modal-header">
           <h2 id="add-cases-title">Add Test Cases</h2>
           <button type="button" className="modal-close" aria-label="Close" onClick={onClose}>
@@ -69,13 +69,13 @@ function AddCasesModal({ existingIds, busy = false, onAdd, onClose }) {
         </div>
 
         <input
+          ref={searchInputRef}
           type="search"
           className="picker-search"
           placeholder="Search test cases by title..."
           aria-label="Search test cases by title"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          autoFocus
         />
 
         {error && (

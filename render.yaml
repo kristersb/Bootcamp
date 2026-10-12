@@ -1,0 +1,26 @@
+# Render Blueprint - https://render.com/docs/blueprint-spec
+#
+# Deploys this repo as a single Node web service: it builds the React client and serves both the built
+# client and the Express API from one process (see server/index.js), so nothing is deployed separately.
+#
+# To use this: push this repo to GitHub/GitLab/Bitbucket, then in the Render dashboard choose
+# New + -> Blueprint and point it at the repo. See the "Deploy" section in README.md for the full walkthrough.
+services:
+  - type: web
+    name: strata-qa
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/hello
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      # Set after the first deploy to the URL Render assigns this service (shown on its dashboard page).
+      # Only used to build links in Discord failure alerts - safe to leave unset otherwise.
+      - key: APP_BASE_URL
+        sync: false
+      # Optional: a Discord incoming webhook URL. Leave unset to disable Discord alerts entirely.
+      - key: DISCORD_WEBHOOK_URL
+        sync: false

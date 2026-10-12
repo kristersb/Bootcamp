@@ -1,0 +1,201 @@
+/* Validated categorical palette (see dataviz skill, references/palette.md) for plain series identity (slots
+   1-5), plus a separate, reserved status scale for charts where the color means good/bad rather than identity
+   (see StatusBreakdownChart). Each pair light/dark via light-dark(), matching this project's dark-mode convention. */
+.dashboard-trends {
+  --series-1: light-dark(#2a78d6, #3987e5); /* blue */
+  --series-2: light-dark(#eb6834, #d95926); /* orange */
+  --series-3: light-dark(#1baf7a, #199e70); /* aqua */
+  --series-4: light-dark(#eda100, #c98500); /* yellow */
+  --series-5: light-dark(#e87ba4, #d55181); /* magenta */
+
+  /* Status scale: fixed, reserved meaning, mode-invariant where the hex already clears 3:1 on both surfaces
+     (good/critical); the two deliberately neutral tones (draft/skipped) likewise stay flat across modes. */
+  --status-good: #0ca30c;
+  --status-critical: #d03b3b;
+  --status-info: light-dark(#2a78d6, #3987e5);
+  --status-draft: #9c9690;
+  --status-skipped: #64748b;
+
+  --chart-ink: light-dark(#0b0b0b, #ffffff);
+  --chart-ink-secondary: light-dark(#52514e, #c3c2b7);
+  --chart-ink-muted: light-dark(#898781, #a5a39c);
+  --chart-grid: light-dark(#ececec, #2e2e2c);
+  --chart-surface: light-dark(#fff, #222);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 1.25rem;
+  margin: 0 0 1.75rem;
+}
+
+.dashboard-trends h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.chart-card {
+  margin: 0;
+  padding: 1.35rem 1.5rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--chart-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The stacked-bar coverage chart reads best at full width, not squeezed into the trend grid's columns. */
+.chart-card-wide {
+  grid-column: 1 / -1;
+}
+
+.chart-card figcaption h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.chart-subtitle {
+  margin: 0.2rem 0 1.1rem;
+  font-size: 0.8rem;
+  color: var(--chart-ink-secondary);
+}
+
+.chart-empty {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--chart-ink-muted);
+}
+
+.chart-svg-wrap {
+  position: relative;
+}
+
+.chart-svg-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* Subtle, one step off the card surface - furniture, never competing with the data. */
+.chart-gridline {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  fill: var(--chart-ink-muted);
+  font-size: 12px;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--status-good);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-dot {
+  fill: var(--status-good);
+  stroke: var(--chart-surface);
+  stroke-width: 2;
+}
+
+.chart-end-label {
+  fill: var(--chart-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chart-crosshair {
+  stroke: var(--chart-ink-muted);
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
+.chart-fill-series-1 {
+  fill: var(--series-1);
+}
+
+.chart-fill-series-2 {
+  fill: var(--series-2);
+}
+
+.chart-bar-group {
+  transition: opacity 0.1s ease;
+}
+
+.chart-bar-group.is-hovered {
+  opacity: 0.85;
+}
+
+.chart-segment-label {
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+/* Hit-target rects are invisible but still focusable - a visible focus ring matters for keyboard users. */
+svg rect[tabindex]:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -120%);
+  min-width: 9rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: light-dark(#1f2328, #f5f5f3);
+  color: light-dark(#fff, #1a1a1a);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.chart-tooltip strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin: 0 0 0.9rem;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--chart-ink-secondary);
+}
+
+.chart-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chart-legend-swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  flex: none;
+}
+
+.chart-table-toggle {
+  margin: 0.6rem 0 0.9rem;
+  font-size: 0.82rem;
+}
+
+.chart-table-toggle summary {
+  cursor: pointer;
+  color: var(--chart-ink-secondary);
+}
+
+.chart-table {
+  margin-top: 0.6rem;
+  min-width: 0;
+}

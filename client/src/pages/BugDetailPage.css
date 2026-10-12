@@ -104,7 +104,7 @@
   width: 0.7rem;
   height: 0.7rem;
   border-radius: 50%;
-  background: light-dark(#1b4f8c, #7aa7e0);
+  background: var(--color-accent-solid);
   border: 2px solid light-dark(#fff, #1a1a1a);
 }
 

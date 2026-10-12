@@ -499,4 +499,21 @@ if (!db.prepare("SELECT 1 FROM app_meta WHERE key = 'reports_seeded'").get()) {
   })()
 }
 
+// One row per user. Only one user exists today, so it is pinned to id 1 rather than keyed by an account table.
+// timezone has no default: NULL means "not set yet", and the client falls back to the browser's timezone for
+// display until the user explicitly saves one.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS user_preferences (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    theme TEXT NOT NULL CHECK (theme IN ('light', 'dark', 'system')) DEFAULT 'system',
+    default_severity_for_new_bugs TEXT NOT NULL CHECK (default_severity_for_new_bugs IN ('Critical', 'Major', 'Minor', 'Trivial')) DEFAULT 'Minor',
+    default_page_size INTEGER NOT NULL CHECK (default_page_size IN (10, 20, 50, 100)) DEFAULT 20,
+    timezone TEXT,
+    auto_generate_report_after_run INTEGER NOT NULL CHECK (auto_generate_report_after_run IN (0, 1)) DEFAULT 1,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`)
+
+db.prepare('INSERT OR IGNORE INTO user_preferences (id) VALUES (1)').run()
+
 module.exports = db

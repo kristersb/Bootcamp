@@ -22,9 +22,9 @@
 .run-case {
   margin-bottom: 0.75rem;
   padding: 0.85rem 1rem;
-  border: 1px solid light-dark(#ddd, #3a3a3a);
-  border-radius: 8px;
-  background: light-dark(#fff, #222);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
   font-size: 0.9rem;
 }
 
@@ -51,17 +51,18 @@
 }
 
 .result-passed {
-  background: light-dark(#dcf3e3, #1f3a2a);
-  color: light-dark(#14532d, #b7e4c7);
+  background: var(--color-pass-bg);
+  color: var(--color-pass-text);
 }
 
 .result-failed {
-  background: light-dark(#fde2e1, #4a2321);
-  color: light-dark(#8f1e17, #ffb4ab);
+  background: var(--color-fail-bg);
+  color: var(--color-fail-text);
 }
 
 .result-skipped {
-  background: light-dark(#e6e6e6, #3a3a3a);
+  background: var(--color-warn-bg);
+  color: var(--color-warn-text);
 }
 
 .result-buttons {
@@ -96,22 +97,22 @@
 }
 
 .result-button-passed[aria-pressed='true'] {
-  background: light-dark(#dcf3e3, #1f3a2a);
-  border-color: light-dark(#2e7d4f, #6fcf97);
+  background: var(--color-pass-bg);
+  border-color: var(--color-pass-text);
 }
 
 .result-button-failed[aria-pressed='true'] {
-  background: light-dark(#fde2e1, #4a2321);
-  border-color: light-dark(#b3261e, #ff8a80);
+  background: var(--color-fail-bg);
+  border-color: var(--color-fail-text);
 }
 
 .result-button-skipped[aria-pressed='true'] {
-  background: light-dark(#e6e6e6, #3a3a3a);
-  border-color: light-dark(#777, #aaa);
+  background: var(--color-warn-bg);
+  border-color: var(--color-warn-text);
 }
 
 .result-button:focus-visible {
-  outline: 2px solid #1b4f8c;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -148,8 +149,8 @@
   gap: 1rem;
   margin: 0 0 1rem;
   padding: 0.7rem 1rem;
-  border: 1px solid light-dark(#ddd, #3a3a3a);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   font-size: 0.9rem;
 }
 
@@ -158,12 +159,13 @@
 }
 
 .run-ready {
-  border-color: light-dark(#7bc496, #2f6b45);
-  background: light-dark(#eefaf2, #1b2c22);
+  border-color: var(--color-pass-text);
+  background: var(--color-pass-bg);
+  color: var(--color-pass-text);
 }
 
 .run-locked {
-  background: light-dark(#f1f1f1, #2a2a2a);
+  background: var(--color-surface-alt);
 }
 
 .run-case-locked {

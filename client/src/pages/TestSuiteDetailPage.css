@@ -76,8 +76,8 @@
 }
 
 .suite-case-item.drag-over {
-  border-color: #1b4f8c;
-  box-shadow: 0 -3px 0 #1b4f8c;
+  border-color: var(--color-focus-ring);
+  box-shadow: 0 -3px 0 var(--color-focus-ring);
 }
 
 .drag-handle {
@@ -124,7 +124,7 @@
 .icon-button:focus-visible,
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible {
-  outline: 2px solid #1b4f8c;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { STATUSES } from '../constants/testCase'
-import { deleteTestCase, listTestCaseSuites, listTestCases } from '../api/testCases'
+import { deleteTestCase, listTestCaseSuites, listTestCases, testCaseExportUrl } from '../api/testCases'
 import ConfirmDialog from '../components/ConfirmDialog'
 import SeverityBadge from '../components/SeverityBadge'
 import RowActionsMenu from '../components/RowActionsMenu'
@@ -160,9 +161,19 @@ function TestCasesPage() {
     <div className="test-cases-page">
       <div className="test-cases-header">
         <h1>Test Cases</h1>
-        <button type="button" className="btn-primary" onClick={() => setModalState('create')}>
-          + Add Test Case
-        </button>
+        <div className="test-cases-header-actions">
+          {/* A plain anchor, not a click handler: the URL itself carries the current filters, and the
+              browser handles the attachment download from the server's Content-Disposition header. */}
+          <a className="btn-secondary" href={testCaseExportUrl({ search, status, sort, order })} download>
+            Download CSV
+          </a>
+          <Link to="/test-cases/import" className="btn-secondary">
+            Import CSV
+          </Link>
+          <button type="button" className="btn-primary" onClick={() => setModalState('create')}>
+            + Add Test Case
+          </button>
+        </div>
       </div>
 
       <div className="test-cases-toolbar">
@@ -281,7 +292,7 @@ function TestCasesPage() {
                 <SeverityBadge severity={testCase.severity} />
               </td>
               <td>
-                <span className="status-pill">{testCase.status}</span>
+                <span className={`status-pill status-pill-${testCase.status}`}>{testCase.status}</span>
               </td>
               <td>{formatDate(testCase.updated_at)}</td>
               <td className="actions-cell">

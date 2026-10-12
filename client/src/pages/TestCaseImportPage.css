@@ -1,0 +1,85 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.import-intro {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.import-intro code {
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+  background: light-dark(#eee, #333);
+  font-size: 0.85rem;
+}
+
+.import-upload-box {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border: 1px dashed light-dark(#ccc, #555);
+  border-radius: 8px;
+}
+
+.import-status-line {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.import-preview-table {
+  min-width: 52rem;
+}
+
+.col-import-row {
+  width: 3.5rem;
+}
+
+.col-import-status {
+  width: 11rem;
+}
+
+.import-row-invalid {
+  background: light-dark(#fdecea, #2a1d1c);
+}
+
+.import-valid-pill,
+.import-invalid-pill {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.import-valid-pill {
+  background: light-dark(#dcf3e3, #1f3a2a);
+  color: light-dark(#14532d, #b7e4c7);
+}
+
+.import-invalid-pill {
+  background: light-dark(#fde2e1, #4a2321);
+  color: light-dark(#8f1e17, #ffb4ab);
+}
+
+.import-row-errors {
+  margin: 0.3rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  color: light-dark(#8f1e17, #ffb4ab);
+}
+
+.import-row-errors li {
+  margin-bottom: 0.15rem;
+}
+
+.import-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}

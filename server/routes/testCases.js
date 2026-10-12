@@ -1,6 +1,8 @@
 const express = require('express')
 const db = require('../db')
 const { resequenceSuite, touchSuite } = require('../suite-ordering')
+const { parseCsv } = require('../csv-parse')
+const { stringifyCsv } = require('../csv-stringify')
 
 const router = express.Router()
 
@@ -98,18 +100,143 @@ function cleanTextList(list = []) {
   return list.map((item) => item.trim()).filter(Boolean)
 }
 
-function handleListTestCases(req, res) {
-  const { search, status, sort, order, page } = req.query
+const IMPORT_LIMITS = {
+  maxContentLength: 2 * 1024 * 1024, // 2MB of raw CSV text
+  maxDataRows: 500, // excludes the header row
+}
 
-  for (const [name, value] of Object.entries({ search, status, sort, order, page })) {
-    if (value !== undefined && typeof value !== 'string') return sendError(res, 400, `${name} must be a single value`)
+// title/severity/steps are the required headers (CLAUDE.md's minimum). preconditions/status are optional and
+// default the same way a manually-created test case does; expectedResult is mapped if present, but
+// validateTestCaseInput still requires a value per row - if the whole column is missing, every row reports
+// "expectedResult is required" individually rather than one file-level error. Known, accepted rough edge.
+const REQUIRED_IMPORT_HEADERS = ['title', 'severity', 'steps']
+const IMPORT_HEADER_ALIASES = {
+  title: 'title',
+  severity: 'severity',
+  steps: 'steps',
+  preconditions: 'preconditions',
+  expectedresult: 'expectedResult', // "Expected Result" / "expected_result" / "expectedresult" all land here
+  status: 'status',
+}
+
+function normalizeHeader(header) {
+  return header.trim().toLowerCase().replace(/[\s_]+/g, '')
+}
+
+// The one place to change if the list-cell convention ever changes (pipe-delimited per the agreed decision).
+function splitListCell(value) {
+  return value.split('|')
+}
+
+// Shared by preview and commit so the two can never validate a row differently. Returns a file-level
+// headerError (nothing parseable, or a required column missing) or a per-row report.
+function parseAndValidateCsvRows(content) {
+  if (typeof content !== 'string') return { headerError: 'content must be a string', rows: [] }
+  if (content.length > IMPORT_LIMITS.maxContentLength) {
+    return {
+      headerError: `file is too large (max ${IMPORT_LIMITS.maxContentLength / (1024 * 1024)} MB of text)`,
+      rows: [],
+    }
   }
-  if (status && !STATUSES.includes(status)) return sendError(res, 400, `status must be one of ${STATUSES.join(', ')}`)
-  if (sort !== undefined && !SORTS.includes(sort)) return sendError(res, 400, `sort must be one of ${SORTS.join(', ')}`)
-  if (order !== undefined && !ORDERS.includes(order)) return sendError(res, 400, `order must be one of ${ORDERS.join(', ')}`)
-  if (page !== undefined && !/^[1-9]\d*$/.test(page)) return sendError(res, 400, 'page must be a whole number, 1 or more')
+
+  const grid = parseCsv(content)
+  if (grid.length === 0) return { headerError: 'file is empty', rows: [] }
+
+  const headerRow = grid[0]
+  const columnForField = {}
+  headerRow.forEach((header, index) => {
+    const field = IMPORT_HEADER_ALIASES[normalizeHeader(header)]
+    if (field) columnForField[field] = index
+  })
+
+  const missing = REQUIRED_IMPORT_HEADERS.filter((field) => !(field in columnForField))
+  if (missing.length) return { headerError: `missing required column(s): ${missing.join(', ')}`, rows: [] }
+
+  // A stray blank line mid-file parses as a single empty cell; it is not a data row worth reporting on.
+  const dataRows = grid.slice(1).filter((cells) => !(cells.length === 1 && cells[0] === ''))
+  if (dataRows.length > IMPORT_LIMITS.maxDataRows) {
+    return {
+      headerError: `file has ${dataRows.length} data rows, which is more than the ${IMPORT_LIMITS.maxDataRows}-row limit`,
+      rows: [],
+    }
+  }
+
+  const rows = dataRows.map((cells, index) => {
+    const cell = (field) => (field in columnForField ? (cells[columnForField[field]] ?? '') : undefined)
+    const status = cell('status')
+
+    const input = {
+      title: (cell('title') ?? '').trim(),
+      preconditions: cell('preconditions') !== undefined ? splitListCell(cell('preconditions')) : [],
+      steps: splitListCell(cell('steps') ?? ''),
+      expectedResult: (cell('expectedResult') ?? '').trim(),
+      severity: (cell('severity') ?? '').trim(),
+      status: status !== undefined && status.trim() !== '' ? status.trim() : undefined,
+    }
+
+    return { rowNumber: index + 2, input, errors: validateTestCaseInput(input) } // +2: header is row 1
+  })
+
+  return { headerError: null, rows }
+}
+
+function handlePreviewTestCaseImport(req, res) {
+  const { headerError, rows } = parseAndValidateCsvRows(req.body.content)
+  if (headerError) return sendError(res, 400, headerError)
+
+  const validCount = rows.filter((row) => row.errors.length === 0).length
+  res.json({
+    success: true,
+    data: { totalRows: rows.length, validCount, invalidCount: rows.length - validCount, rows },
+    error: null,
+  })
+}
+
+function handleCommitTestCaseImport(req, res) {
+  const { headerError, rows } = parseAndValidateCsvRows(req.body.content)
+  if (headerError) return sendError(res, 400, headerError)
+
+  const validRows = rows.filter((row) => row.errors.length === 0)
+  const skipped = rows.filter((row) => row.errors.length > 0).map(({ rowNumber, errors }) => ({ rowNumber, errors }))
+
+  const insertRow = db.prepare(
+    `INSERT INTO test_cases (title, preconditions, steps, expected_result, severity, status)
+     VALUES (@title, @preconditions, @steps, @expectedResult, @severity, @status)`
+  )
+
+  const imported = db.transaction(() =>
+    validRows.map(({ rowNumber, input }) => {
+      const { title, preconditions, steps, expectedResult, severity, status = 'draft' } = input
+      const result = insertRow.run({
+        title: title.trim(),
+        preconditions: JSON.stringify(cleanTextList(preconditions)),
+        steps: JSON.stringify(cleanTextList(steps)),
+        expectedResult: expectedResult.trim(),
+        severity,
+        status,
+      })
+      return { rowNumber, id: result.lastInsertRowid, title: title.trim() }
+    })
+  )()
+
+  res.json({
+    success: true,
+    data: { importedCount: imported.length, imported, skippedCount: skipped.length, skipped },
+    error: null,
+  })
+}
+
+// Shared by the list endpoint and the CSV export, so "what you're looking at" and "what you export" can never
+// drift apart. Returns either { error } or a ready-to-use { whereSql, params, sortSql, orderSql }.
+function buildTestCaseFilter({ search, status, sort, order }) {
+  for (const [name, value] of Object.entries({ search, status, sort, order })) {
+    if (value !== undefined && typeof value !== 'string') return { error: `${name} must be a single value` }
+  }
+  if (status && !STATUSES.includes(status)) return { error: `status must be one of ${STATUSES.join(', ')}` }
+  if (sort !== undefined && !SORTS.includes(sort)) return { error: `sort must be one of ${SORTS.join(', ')}` }
+  if (order !== undefined && !ORDERS.includes(order)) return { error: `order must be one of ${ORDERS.join(', ')}` }
   if (search !== undefined && search.trim().length > LIMITS.search) {
-    return sendError(res, 400, `search can be at most ${LIMITS.search} characters`)
+    return { error: `search can be at most ${LIMITS.search} characters` }
   }
 
   const where = []
@@ -126,9 +253,22 @@ function handleListTestCases(req, res) {
     params.status = status
   }
 
-  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : ''
-  const sortSql = sort === 'severity' ? SEVERITY_RANK_SQL : 'updated_at'
-  const orderSql = order === 'asc' ? 'ASC' : 'DESC'
+  return {
+    whereSql: where.length ? `WHERE ${where.join(' AND ')}` : '',
+    params,
+    sortSql: sort === 'severity' ? SEVERITY_RANK_SQL : 'updated_at',
+    orderSql: order === 'asc' ? 'ASC' : 'DESC',
+  }
+}
+
+function handleListTestCases(req, res) {
+  const { page } = req.query
+  if (page !== undefined && typeof page !== 'string') return sendError(res, 400, 'page must be a single value')
+  if (page !== undefined && !/^[1-9]\d*$/.test(page)) return sendError(res, 400, 'page must be a whole number, 1 or more')
+
+  const filter = buildTestCaseFilter(req.query)
+  if (filter.error) return sendError(res, 400, filter.error)
+  const { whereSql, params, sortSql, orderSql } = filter
 
   const { total } = db.prepare(`SELECT COUNT(*) AS total FROM test_cases ${whereSql}`).get(params)
 
@@ -150,6 +290,65 @@ function handleListTestCases(req, res) {
     data: { items: rows.map(rowToTestCase), total, page: currentPage, pageSize: PAGE_SIZE },
     error: null,
   })
+}
+
+const EXPORT_HEADER = [
+  'ID',
+  'Title',
+  'Description',
+  'Suite',
+  'Severity',
+  'Status',
+  'Steps',
+  'Expected Outcome',
+  'Created At',
+  'Updated At',
+]
+
+// Same search/status/sort filter as the list endpoint, but every matching row, not one page - this is a
+// download of "what you're looking at," not a sample of it. "Description" has no dedicated column in this
+// app's data model, so it's filled from preconditions (the only other free-text field); "Suite" lists every
+// suite the case belongs to (a case can be in zero, one, or several), pipe-separated, same convention as the
+// Steps cell format in the CSV import feature.
+function handleExportTestCases(req, res) {
+  const filter = buildTestCaseFilter(req.query)
+  if (filter.error) return sendError(res, 400, filter.error)
+  const { whereSql, params, sortSql, orderSql } = filter
+
+  const rows = db
+    .prepare(
+      `SELECT t.*,
+              (SELECT GROUP_CONCAT(s.name, '|')
+               FROM test_suite_cases c JOIN test_suites s ON s.id = c.suite_id
+               WHERE c.test_case_id = t.id
+               ORDER BY s.name COLLATE NOCASE) AS suite_names
+       FROM test_cases t
+       ${whereSql}
+       ORDER BY ${sortSql} ${orderSql}, t.id ${orderSql}`
+    )
+    .all(params)
+
+  const dataRows = rows.map((row) => [
+    row.id,
+    row.title,
+    cleanTextList(JSON.parse(row.preconditions)).join('|'),
+    row.suite_names || '',
+    row.severity,
+    row.status,
+    cleanTextList(JSON.parse(row.steps)).join('|'),
+    row.expected_result,
+    row.created_at,
+    row.updated_at,
+  ])
+
+  const csv = stringifyCsv([EXPORT_HEADER, ...dataRows])
+  const today = new Date().toISOString().slice(0, 10)
+
+  res.set({
+    'Content-Type': 'text/csv; charset=utf-8',
+    'Content-Disposition': `attachment; filename="test-cases-export-${today}.csv"`,
+  })
+  return res.send(csv)
 }
 
 function handleGetTestCase(req, res) {
@@ -259,8 +458,12 @@ function handleDeleteTestCase(req, res) {
 }
 
 router.get('/', handleListTestCases)
+// Must come before GET /:id - otherwise "export" would be matched as the :id segment and 404 via router.param.
+router.get('/export', handleExportTestCases)
 router.get('/:id', handleGetTestCase)
 router.get('/:id/suites', handleListTestCaseSuites)
+router.post('/import/preview', handlePreviewTestCaseImport)
+router.post('/import', handleCommitTestCaseImport)
 router.post('/', handleCreateTestCase)
 router.put('/:id', handleUpdateTestCase)
 router.delete('/:id', handleDeleteTestCase)

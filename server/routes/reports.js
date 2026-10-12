@@ -71,7 +71,17 @@ function handleGetReport(req, res) {
   return sendSuccess(res, report)
 }
 
-const PRODUCT_NAME = 'QA Workbench'
+const PRODUCT_NAME = 'Strata QA'
+
+// Same mark as client/src/components/Logo.jsx, duplicated here as a plain string: this file generates raw
+// HTML server-side, so it can't import a React component the way the nav bar does.
+const LOGO_SVG =
+  '<svg width="22" height="22" viewBox="0 0 32 32" role="img" aria-label="Strata QA logo">' +
+  '<rect x="2" y="2" width="28" height="28" rx="8" fill="none" stroke="#0e7490" stroke-width="2"/>' +
+  '<rect x="8" y="20" width="16" height="3" rx="1.5" fill="#64748b"/>' +
+  '<rect x="8" y="15" width="12" height="3" rx="1.5" fill="#94a3b8"/>' +
+  '<path d="M8 11 L11.5 14.5 L18 8" fill="none" stroke="#0e7490" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '</svg>'
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
@@ -138,19 +148,22 @@ function renderReportHtml(report) {
 <style>
   :root {
     color-scheme: light;
-    --color-pass: #1a7f4e;
-    --color-pass-bg: #e3f7ec;
-    --color-fail: #b3261e;
-    --color-fail-bg: #fdecea;
-    --color-skip: #8a6400;
-    --color-skip-bg: #fbf0d1;
+    --color-brand: #0f172a;
+    --color-accent: #0e7490;
+    --color-pass: #065f46;
+    --color-pass-bg: #d1fae5;
+    --color-fail: #9f1239;
+    --color-fail-bg: #ffe4e6;
+    --color-skip: #92400e;
+    --color-skip-bg: #fef3c7;
     --color-pending: #555;
     --color-pending-bg: #ececec;
-    --color-border: #e2e2e5;
-    --color-muted: #666;
+    --color-border: #e2e8f0;
+    --color-muted: #64748b;
   }
   * { box-sizing: border-box; }
   svg { width: 0.7rem; height: 0.7rem; fill: currentColor; flex: none; }
+  .report-brand svg { width: 22px; height: 22px; }
   body {
     margin: 0;
     padding: 2.5rem 1.5rem;
@@ -169,13 +182,16 @@ function renderReportHtml(report) {
   .print-button {
     margin-bottom: 1.5rem;
     padding: 0.55rem 1.1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background: #f5f5f5;
+    border: 1px solid var(--color-accent);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--color-accent);
     font: inherit;
+    font-weight: 600;
     cursor: pointer;
   }
-  .print-button:hover { background: #ebebeb; }
+  .print-button:hover { background: #ecfeff; }
+  .report-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.3rem; }
   .eyebrow { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); }
   h1 { margin: 0.2rem 0 1.25rem; font-size: 1.6rem; }
   .meta-grid {
@@ -253,7 +269,7 @@ function renderReportHtml(report) {
 <div class="sheet">
   <button type="button" class="print-button" onclick="window.print()">Print / Save as PDF</button>
 
-  <p class="eyebrow">${PRODUCT_NAME} &middot; Test Report</p>
+  <div class="report-brand">${LOGO_SVG}<p class="eyebrow">${PRODUCT_NAME} &middot; Test Report</p></div>
   <h1>${escapeHtml(report.suite_name)}</h1>
 
   <dl class="meta-grid">

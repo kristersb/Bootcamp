@@ -1,7 +1,57 @@
+/* Strata QA design tokens - "Technical/Editorial Minimal".
+   Every color pair here has been checked against WCAG 2.1 AA (4.5:1 text, 3:1 UI) - see the two accent
+   shades below for why there are two: the brief's accent (#06b6d4) fails AA as text/an outline on a light
+   surface (2.43:1), so a darker step of the same hue is used there, with the bright one reserved for use
+   on the dark brand chrome (where it passes at 7.35:1). */
 :root {
   color-scheme: light dark;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  --color-bg: light-dark(#f8fafc, #0f172a);
+  --color-surface: light-dark(#ffffff, #1e293b);
+  --color-surface-alt: light-dark(#f1f5f9, #16213a);
+  --color-border: light-dark(#e2e8f0, #334155);
+  --color-text: light-dark(#0f172a, #f1f5f9);
+  --color-text-muted: light-dark(#64748b, #94a3b8);
+
+  /* Fixed brand chrome (nav bar, report header): stays navy regardless of light/dark mode, like the brief asks. */
+  --color-chrome-bg: #0f172a;
+  --color-chrome-text: #f8fafc;
+  --color-chrome-text-muted: #94a3b8;
+
+  /* Accent (cyan): bright version for the dark chrome, a deeper step for text/outlines on light surfaces. */
+  --color-accent: #06b6d4;
+  --color-accent-on-chrome-text: #0f172a;
+  --color-accent-text: light-dark(#0e7490, #22d3ee);
+  --color-focus-ring: light-dark(#0e7490, #06b6d4);
+  /* Fixed (not light-dark): a solid CTA button needs the same accessible pairing in both themes - the
+     bright #06b6d4 only clears AA with dark text, which would look wrong painted on a solid button. */
+  --color-accent-solid: #0e7490;
+  --color-accent-solid-text: #ffffff;
+
+  /* Status tokens: light tint + a dark step of the same hue for text, same pattern as the severity badges. */
+  --color-pass-bg: light-dark(#d1fae5, #053b2c);
+  --color-pass-text: light-dark(#065f46, #6ee7b7);
+  --color-fail-bg: light-dark(#ffe4e6, #4c0519);
+  --color-fail-text: light-dark(#9f1239, #fda4af);
+  --color-warn-bg: light-dark(#fef3c7, #451a03);
+  --color-warn-text: light-dark(#92400e, #fcd34d);
+
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
 }
 
 body {
   margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
 }

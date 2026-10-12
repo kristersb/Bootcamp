@@ -12,12 +12,15 @@ const bugsRouter = require('./routes/bugs')
 const testRunsRouter = require('./routes/test-runs')
 const dashboardRouter = require('./routes/dashboard')
 const reportsRouter = require('./routes/reports')
+const settingsRouter = require('./routes/settings')
 const { handleRequestError } = require('./error-handler')
 
 const app = express()
-const PORT = process.env.SERVER_PORT || 3001
+// Most hosts (Render, Railway, Heroku...) inject PORT and require the app to bind to it; SERVER_PORT is
+// this project's own local-dev override, kept as a fallback so existing dev setups don't need to change.
+const PORT = process.env.PORT || process.env.SERVER_PORT || 3001
 
-app.use(express.json())
+app.use(express.json({ limit: '3mb' })) // headroom for CSV test-case imports (see routes/testCases.js)
 
 app.get('/api/hello', (req, res) => {
   res.json({ success: true, data: { message: 'Hello from the Express server!' }, error: null })
@@ -29,6 +32,7 @@ app.use('/api/bugs', bugsRouter)
 app.use('/api/test-runs', testRunsRouter)
 app.use('/api/dashboard', dashboardRouter)
 app.use('/api/reports', reportsRouter)
+app.use('/api/settings', settingsRouter)
 
 app.use('/api', (req, res) => {
   res.status(404).json({ success: false, data: null, error: 'API route not found' })

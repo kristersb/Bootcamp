@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { runStatusLabel } from '../constants/test-run'
-import { getDashboardMetrics } from '../api/dashboard'
+import { getDashboardMetrics, getDashboardTrends } from '../api/dashboard'
 import { describeActivity } from '../utils/describe-activity'
 import { formatDate } from '../utils/format-date'
 import { formatDuration } from '../utils/format-duration'
+import PassRateTrendChart from '../components/charts/PassRateTrendChart'
+import BugsPerWeekChart from '../components/charts/BugsPerWeekChart'
+import StatusBreakdownChart from '../components/charts/StatusBreakdownChart'
 import './TestCasesPage.css'
 import './DashboardPage.css'
+import '../components/charts/DashboardCharts.css'
 
 const REFRESH_MS = 30_000
 
@@ -113,6 +117,7 @@ function DashboardSkeleton() {
 
 function DashboardPage() {
   const [data, setData] = useState(null)
+  const [trends, setTrends] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [updatedAt, setUpdatedAt] = useState(null)
@@ -126,7 +131,9 @@ function DashboardPage() {
     inFlight.current = true
     setRefreshing(true)
     try {
-      setData(await getDashboardMetrics())
+      const [metrics, trendsData] = await Promise.all([getDashboardMetrics(), getDashboardTrends()])
+      setData(metrics)
+      setTrends(trendsData)
       setUpdatedAt(new Date())
       setError('')
     } catch (err) {
@@ -200,6 +207,19 @@ function DashboardPage() {
             ))}
           </dl>
 
+          {trends && (
+            <section aria-labelledby="trends-heading">
+              <h2 id="trends-heading">Trends</h2>
+              <div className="dashboard-trends">
+                <PassRateTrendChart data={trends.pass_rate_trend} />
+                <BugsPerWeekChart data={trends.bugs_per_week} />
+                <div className="chart-card-wide">
+                  <StatusBreakdownChart data={trends.test_case_status_breakdown} />
+                </div>
+              </div>
+            </section>
+          )}
+
           <div className="dashboard-panels">
             <section className="dashboard-panel" aria-labelledby="recent-runs-heading">
               <h2 id="recent-runs-heading">Recent test runs</h2>
@@ -253,25 +273,29 @@ function DashboardPage() {
               )}
             </section>
 
-            <section className="dashboard-panel" aria-labelledby="recent-activity-heading">
-              <h2 id="recent-activity-heading">Recent activity</h2>
-              {data.recent_activity.length === 0 ? (
-                <PanelEmpty icon="✎" title="No activity yet" action={{ to: '/bugs', label: 'Report a bug' }}>
-                  Bug reports, status changes and comments show up here as they happen.
-                </PanelEmpty>
-              ) : (
-                <ul className="activity-feed">
-                  {data.recent_activity.map((item) => (
-                    <li key={item.id}>
-                      <Link className="bug-link" to={`/bugs/${item.bug_id}`}>
-                        {describeActivity(item)}
-                      </Link>
-                      <span className="activity-title">{item.bug_title}</span>
-                      <span className="activity-when">{formatDate(item.created_at)}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <section className="dashboard-panel">
+              <details className="activity-disclosure">
+                <summary>
+                  <h2>Recent activity</h2>
+                </summary>
+                {data.recent_activity.length === 0 ? (
+                  <PanelEmpty icon="✎" title="No activity yet" action={{ to: '/bugs', label: 'Report a bug' }}>
+                    Bug reports, status changes and comments show up here as they happen.
+                  </PanelEmpty>
+                ) : (
+                  <ul className="activity-feed">
+                    {data.recent_activity.map((item) => (
+                      <li key={item.id}>
+                        <Link className="bug-link" to={`/bugs/${item.bug_id}`}>
+                          {describeActivity(item)}
+                        </Link>
+                        <span className="activity-title">{item.bug_title}</span>
+                        <span className="activity-when">{formatDate(item.created_at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </details>
             </section>
           </div>
         </>

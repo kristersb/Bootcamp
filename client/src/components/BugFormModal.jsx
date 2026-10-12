@@ -3,6 +3,7 @@ import { BUG_LIMITS as LIMITS, BUG_PRIORITIES, BUG_SEVERITIES } from '../constan
 import { createBug, updateBug } from '../api/bugs'
 import { useDialog } from '../hooks/use-dialog'
 import { useSingleFlight } from '../hooks/use-single-flight'
+import { useSettings } from '../context/SettingsContext'
 import ConfirmDialog from './ConfirmDialog'
 import TextListField from './TextListField'
 import './TestCaseFormModal.css'
@@ -11,10 +12,12 @@ function BugFormModal({ bug, onClose, onSaved, onStale }) {
   const isEdit = Boolean(bug)
   const uid = useId()
   const id = (name) => `${uid}-${name}`
+  const { settings } = useSettings()
 
   const [title, setTitle] = useState(bug?.title ?? '')
   const [description, setDescription] = useState(bug?.description ?? '')
-  const [severity, setSeverity] = useState(bug?.severity ?? '')
+  // New bugs start at the user's configured default severity (Settings > Bugs); editing keeps the bug's own value.
+  const [severity, setSeverity] = useState(bug?.severity ?? settings?.default_severity_for_new_bugs ?? '')
   const [priority, setPriority] = useState(bug?.priority ?? 'medium')
   const [steps, setSteps] = useState(bug?.steps_to_reproduce?.length ? bug.steps_to_reproduce : [''])
   const [expected, setExpected] = useState(bug?.expected ?? '')

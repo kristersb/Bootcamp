@@ -1,0 +1,65 @@
+.quick-search-card {
+  max-width: 560px;
+  padding: 0.75rem;
+}
+
+.quick-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid light-dark(#ccc, #444);
+  background: light-dark(#fff, #2a2a2a);
+  color: inherit;
+}
+
+.quick-search-input:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.quick-search-results {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.quick-search-hint {
+  padding: 0.9rem 0.6rem;
+  font-size: 0.9rem;
+  opacity: 0.65;
+}
+
+.quick-search-result {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.quick-search-result.is-active {
+  background: light-dark(#eaf1fb, #1e2f45);
+}
+
+.quick-search-result-type {
+  flex-shrink: 0;
+  min-width: 5.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: light-dark(#eee, #333);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.quick-search-result-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

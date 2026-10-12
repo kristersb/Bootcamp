@@ -1,0 +1,45 @@
+.settings-page form {
+  max-width: 28rem;
+}
+
+.settings-group {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  padding: 0.5rem 1rem 1rem;
+  margin: 0 0 1.25rem;
+}
+
+.settings-group legend {
+  padding: 0 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.settings-group .field {
+  margin-bottom: 0;
+}
+
+.settings-group select,
+.settings-group input[type='text'] {
+  max-width: 20rem;
+}
+
+.field-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 400;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-saved {
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+}
