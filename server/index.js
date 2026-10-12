@@ -13,6 +13,7 @@ const testRunsRouter = require('./routes/test-runs')
 const dashboardRouter = require('./routes/dashboard')
 const reportsRouter = require('./routes/reports')
 const settingsRouter = require('./routes/settings')
+const flakyTestsRouter = require('./routes/flaky-tests')
 const { handleRequestError } = require('./error-handler')
 
 const app = express()
@@ -33,6 +34,7 @@ app.use('/api/test-runs', testRunsRouter)
 app.use('/api/dashboard', dashboardRouter)
 app.use('/api/reports', reportsRouter)
 app.use('/api/settings', settingsRouter)
+app.use('/api/flaky-tests', flakyTestsRouter)
 
 app.use('/api', (req, res) => {
   res.status(404).json({ success: false, data: null, error: 'API route not found' })
