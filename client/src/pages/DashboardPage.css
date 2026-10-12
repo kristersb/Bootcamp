@@ -113,7 +113,7 @@
   flex-direction: column;
   gap: 0.1rem;
   padding: 0.55rem 0;
-  border-bottom: 1px solid light-dark(#eee, #333);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .activity-title {
@@ -149,8 +149,8 @@
   align-items: center;
   padding: 2rem 1.25rem;
   text-align: center;
-  border: 1px dashed light-dark(#c4c4c4, #4a4a4a);
-  border-radius: 8px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .panel-empty-icon {
@@ -160,7 +160,7 @@
   height: 2.75rem;
   margin-bottom: 0.75rem;
   border-radius: 50%;
-  background: light-dark(#eee, #2c2c2c);
+  background: var(--color-surface-alt);
   font-size: 1.1rem;
   opacity: 0.8;
 }
@@ -181,12 +181,7 @@
 .skeleton {
   display: block;
   border-radius: 4px;
-  background: linear-gradient(
-    90deg,
-    light-dark(#eee, #2c2c2c) 25%,
-    light-dark(#f7f7f7, #383838) 50%,
-    light-dark(#eee, #2c2c2c) 75%
-  );
+  background: linear-gradient(90deg, var(--color-surface-alt) 25%, var(--color-surface) 50%, var(--color-surface-alt) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }
