@@ -233,3 +233,9 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+@media (max-width: 25rem) {
+  .dashboard-trends {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -18,9 +18,9 @@
 
   --chart-ink: light-dark(#0b0b0b, #ffffff);
   --chart-ink-secondary: light-dark(#52514e, #c3c2b7);
-  --chart-ink-muted: light-dark(#898781, #a5a39c);
+  --chart-ink-muted: light-dark(#78766d, #a5a39c); /* darkened from #898781: ~3.6:1 on white failed AA text contrast */
   --chart-grid: light-dark(#ececec, #2e2e2c);
-  --chart-surface: light-dark(#fff, #222);
+  --chart-surface: var(--color-surface);
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
