@@ -1,0 +1,33 @@
+.flaky-timeline {
+  display: inline-flex;
+  gap: 0.2rem;
+  align-items: center;
+}
+
+.timeline-pill {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 2px;
+  flex: none;
+}
+
+.timeline-pill-passed {
+  background: var(--color-pass-bg);
+  border: 1px solid var(--color-pass-text);
+}
+
+.timeline-pill-failed {
+  background: var(--color-fail-bg);
+  border: 1px solid var(--color-fail-text);
+}
+
+.timeline-pill-skipped {
+  background: var(--color-warn-bg);
+  border: 1px solid var(--color-warn-text);
+}
+
+.timeline-pill-pending {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-text-muted);
+}

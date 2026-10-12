@@ -11,6 +11,7 @@ import TestRunsPage from './pages/TestRunsPage'
 import TestRunDetailPage from './pages/TestRunDetailPage'
 import ReportsPage from './pages/ReportsPage'
 import ReportDetailPage from './pages/ReportDetailPage'
+import FlakyTestsPage from './pages/FlakyTestsPage'
 import SettingsPage from './pages/SettingsPage'
 import ShortcutManager from './components/ShortcutManager'
 import Logo from './components/Logo'
@@ -66,6 +67,9 @@ function App() {
           <NavLink to="/test-runs" onClick={closeNav}>
             Test Runs
           </NavLink>
+          <NavLink to="/flaky-tests" onClick={closeNav}>
+            Flaky Tests
+          </NavLink>
           <NavLink to="/reports" onClick={closeNav}>
             Reports
           </NavLink>
@@ -88,6 +92,7 @@ function App() {
           <Route path="/test-suites/:id" element={<TestSuiteDetailPage />} />
           <Route path="/test-runs" element={<TestRunsPage />} />
           <Route path="/test-runs/:id" element={<TestRunDetailPage />} />
+          <Route path="/flaky-tests" element={<FlakyTestsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/reports/:id" element={<ReportDetailPage />} />
           <Route path="/bugs" element={<BugsPage />} />

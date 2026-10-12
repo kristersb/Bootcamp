@@ -1,0 +1,36 @@
+.flaky-tests-intro {
+  max-width: 48rem;
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.col-flaky-score {
+  width: 5rem;
+}
+
+.col-flaky-flips {
+  width: 4.5rem;
+}
+
+.col-flaky-timeline {
+  width: 8rem;
+}
+
+.col-flaky-hypothesis {
+  width: 22rem;
+}
+
+.flaky-score-cell {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.flaky-hypothesis-cell {
+  font-size: 0.85rem;
+}
+
+.flaky-hypothesis-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
