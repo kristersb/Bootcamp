@@ -79,8 +79,8 @@
   font: inherit;
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #2a2a2a);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: inherit;
 }
 
@@ -88,7 +88,7 @@
   list-style: none;
   margin: 0;
   padding: 0 0 0 1rem;
-  border-left: 2px solid light-dark(#ddd, #3a3a3a);
+  border-left: 2px solid var(--color-border);
 }
 
 .timeline-item {
@@ -105,11 +105,11 @@
   height: 0.7rem;
   border-radius: 50%;
   background: var(--color-accent-solid);
-  border: 2px solid light-dark(#fff, #1a1a1a);
+  border: 2px solid var(--color-bg);
 }
 
 .timeline-comment::before {
-  background: light-dark(#888, #aaa);
+  background: var(--color-text-muted);
 }
 
 .timeline-head {
