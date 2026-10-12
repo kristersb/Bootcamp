@@ -34,8 +34,8 @@
   min-width: 10rem;
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #2a2a2a);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: inherit;
   font: inherit;
 }
@@ -43,8 +43,8 @@
 .test-cases-toolbar select {
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #2a2a2a);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: inherit;
   font: inherit;
 }
@@ -96,7 +96,7 @@
 .test-cases-table td {
   text-align: left;
   padding: 0.6rem 0.5rem;
-  border-bottom: 1px solid light-dark(#eee, #333);
+  border-bottom: 1px solid var(--color-border);
   overflow-wrap: anywhere;
 }
 
@@ -231,7 +231,7 @@
 .pagination button {
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #555);
+  border: 1px solid var(--color-border);
   background: none;
   color: inherit;
   cursor: pointer;
@@ -243,6 +243,6 @@
 }
 
 .form-error {
-  color: light-dark(#b3261e, #ff8a80);
+  color: var(--color-fail-text);
   font-size: 0.85rem;
 }

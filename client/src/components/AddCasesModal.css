@@ -9,8 +9,8 @@
   padding: 0.5rem;
   margin-bottom: 0.75rem;
   border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #2a2a2a);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: inherit;
 }
 
@@ -20,7 +20,7 @@
   padding: 0;
   max-height: 340px;
   overflow-y: auto;
-  border: 1px solid light-dark(#eee, #333);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
 }
 
@@ -29,7 +29,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid light-dark(#eee, #333);
+  border-bottom: 1px solid var(--color-border);
   font-size: 0.9rem;
 }
 

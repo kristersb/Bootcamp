@@ -15,15 +15,15 @@
 .import-intro code {
   padding: 0.05rem 0.3rem;
   border-radius: 4px;
-  background: light-dark(#eee, #333);
+  background: var(--color-surface-alt);
   font-size: 0.85rem;
 }
 
 .import-upload-box {
   margin-bottom: 1rem;
   padding: 1.25rem;
-  border: 1px dashed light-dark(#ccc, #555);
-  border-radius: 8px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .import-status-line {
@@ -45,7 +45,7 @@
 }
 
 .import-row-invalid {
-  background: light-dark(#fdecea, #2a1d1c);
+  background: var(--color-fail-bg);
 }
 
 .import-valid-pill,
@@ -58,20 +58,20 @@
 }
 
 .import-valid-pill {
-  background: light-dark(#dcf3e3, #1f3a2a);
-  color: light-dark(#14532d, #b7e4c7);
+  background: var(--color-pass-bg);
+  color: var(--color-pass-text);
 }
 
 .import-invalid-pill {
-  background: light-dark(#fde2e1, #4a2321);
-  color: light-dark(#8f1e17, #ffb4ab);
+  background: var(--color-fail-bg);
+  color: var(--color-fail-text);
 }
 
 .import-row-errors {
   margin: 0.3rem 0 0;
   padding-left: 1.1rem;
   font-size: 0.78rem;
-  color: light-dark(#8f1e17, #ffb4ab);
+  color: var(--color-fail-text);
 }
 
 .import-row-errors li {

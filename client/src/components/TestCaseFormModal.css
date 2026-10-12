@@ -58,8 +58,8 @@
   font: inherit;
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #2a2a2a);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: inherit;
 }
 
@@ -104,7 +104,7 @@
 
 .add-list-item {
   background: none;
-  border: 1px dashed light-dark(#bbb, #555);
+  border: 1px dashed var(--color-border);
   border-radius: 6px;
   padding: 0.3rem 0.6rem;
   cursor: pointer;
@@ -114,13 +114,13 @@
 }
 
 .field-error {
-  color: light-dark(#b3261e, #ff8a80);
+  color: var(--color-fail-text);
   font-size: 0.8rem;
   font-weight: 400;
 }
 
 .form-error {
-  color: light-dark(#b3261e, #ff8a80);
+  color: var(--color-fail-text);
   font-size: 0.85rem;
   margin: -0.4rem 0 1rem;
 }

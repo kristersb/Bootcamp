@@ -14,7 +14,7 @@
 }
 
 .row-actions-trigger:hover {
-  background: light-dark(#eee, #333);
+  background: var(--color-surface-alt);
 }
 
 .row-actions-menu {
@@ -22,8 +22,8 @@
   right: 0;
   top: 100%;
   z-index: 10;
-  background: light-dark(#fff, #222);
-  border: 1px solid light-dark(#ddd, #444);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 100px;
@@ -44,7 +44,7 @@
 
 .row-actions-menu button:hover,
 .row-actions-menu button:focus-visible {
-  background: light-dark(#f2f2f2, #333);
+  background: var(--color-surface-alt);
 }
 
 .row-actions-trigger:focus-visible,
@@ -54,5 +54,5 @@
 }
 
 .row-actions-menu button.danger {
-  color: light-dark(#b3261e, #ff8a80);
+  color: var(--color-fail-text);
 }

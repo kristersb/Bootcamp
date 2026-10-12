@@ -10,8 +10,8 @@
   font: inherit;
   font-size: 1rem;
   border-radius: 8px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #2a2a2a);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: inherit;
 }
 
@@ -53,7 +53,7 @@
   min-width: 5.5rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
-  background: light-dark(#eee, #333);
+  background: var(--color-surface-alt);
   font-size: 0.75rem;
   text-align: center;
 }

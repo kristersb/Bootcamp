@@ -31,8 +31,8 @@
 }
 
 .btn-danger {
-  color: light-dark(#b3261e, #ff8a80);
-  border-color: light-dark(#b3261e, #ff8a80);
+  color: var(--color-fail-text);
+  border-color: var(--color-fail-text);
 }
 
 .suite-cases-header {
@@ -48,8 +48,8 @@
 }
 
 .suite-empty {
-  border: 1px dashed light-dark(#ccc, #555);
-  border-radius: 8px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .suite-case-list {
@@ -64,9 +64,9 @@
   gap: 0.75rem;
   padding: 0.6rem 0.75rem;
   margin-bottom: 0.4rem;
-  border: 1px solid light-dark(#ddd, #3a3a3a);
-  border-radius: 8px;
-  background: light-dark(#fff, #222);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
   font-size: 0.9rem;
   cursor: grab;
 }
@@ -113,7 +113,7 @@
 }
 
 .icon-button:hover:not(:disabled) {
-  background: light-dark(#eee, #333);
+  background: var(--color-surface-alt);
 }
 
 .icon-button:disabled {
