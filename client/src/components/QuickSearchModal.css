@@ -45,7 +45,9 @@
 }
 
 .quick-search-result.is-active {
-  background: light-dark(#eaf1fb, #1e2f45);
+  /* #1e2f45 was nearly indistinguishable from --color-surface's dark value (#1e293b, ~1.08:1) -
+     this keyboard-selection highlight needs real separation from the card behind it. */
+  background: light-dark(#eaf1fb, #26405e);
 }
 
 .quick-search-result-type {

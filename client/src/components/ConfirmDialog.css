@@ -24,6 +24,9 @@
 }
 
 .btn-primary.btn-danger-solid {
-  background: #b3261e;
+  /* Fixed (not light-dark): a solid button needs the same accessible pairing in both themes,
+     matching --color-accent-solid's rationale. #9f1239 (same hue step as --color-fail-text's
+     light value) clears AA with white in both modes. */
+  background: #9f1239;
   color: #fff;
 }

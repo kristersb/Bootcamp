@@ -8,6 +8,7 @@
 
 .suite-detail-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
@@ -132,4 +133,18 @@
   font-size: 0.8rem;
   opacity: 0.65;
   margin-top: 0.75rem;
+}
+
+@media (max-width: 30rem) {
+  .suite-case-item {
+    flex-wrap: wrap;
+  }
+
+  .case-title {
+    flex-basis: 100%;
+  }
+
+  .case-controls {
+    margin-left: auto;
+  }
 }

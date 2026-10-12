@@ -8,21 +8,21 @@
 }
 
 .severity-critical {
-  background: #fde2e1;
-  color: #8f1e17;
+  background: var(--color-fail-bg);
+  color: var(--color-fail-text);
 }
 
 .severity-major {
-  background: #ffe9cf;
-  color: #8a4b05;
+  background: light-dark(#ffe9cf, #452b0c);
+  color: light-dark(#8a4b05, #f1d3b1);
 }
 
 .severity-minor {
-  background: #fff6cf;
-  color: #7a6304;
+  background: light-dark(#fff6cf, #453a0c);
+  color: light-dark(#7a6304, #f1e5b1);
 }
 
 .severity-trivial {
-  background: #e4f0ff;
-  color: #1b4f8c;
+  background: light-dark(#e4f0ff, #0c2645);
+  color: light-dark(#1b4f8c, #b1cff1);
 }
