@@ -365,6 +365,23 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_test_runs_start ON test_runs_v2 (start_time);
 `)
 
+// Caches a human-written root-cause hypothesis per test case (only the flake-analyzer agent writes the
+// hypothesis_* columns; the flakiness score itself is never cached here, it's always computed live from
+// test_run_results by server/flakiness.js). Also tracks whether a "this test just became flaky" Discord
+// alert has already gone out, so repeated updates to an already-flaky case don't resend it - the same
+// purpose test_run_results.alert_sent serves for failure alerts, just scoped per-case instead of per-result.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS flaky_test_insights (
+    test_case_id INTEGER PRIMARY KEY REFERENCES test_cases(id) ON DELETE CASCADE,
+    hypothesis TEXT,
+    hypothesis_computed_at TEXT,
+    hypothesis_computed_by TEXT,
+    flaky_alert_sent INTEGER NOT NULL DEFAULT 0 CHECK (flaky_alert_sent IN (0, 1)),
+    flaky_alert_sent_at TEXT,
+    flaky_alert_score INTEGER
+  )
+`)
+
 // A run is only finished when someone completes it, which sets locked_at and freezes the results.
 // Runs from before this existed finished by themselves, so they are put back to "in-progress" with every outcome
 // still recorded. They are not locked on anyone's behalf: the person completes them with the usual confirmation.
@@ -496,6 +513,86 @@ if (!db.prepare("SELECT 1 FROM app_meta WHERE key = 'reports_seeded'").get()) {
     }
 
     db.prepare("INSERT INTO app_meta (key, value) VALUES ('reports_seeded', '1')").run()
+  })()
+}
+
+// Adds extra historical runs on top of the single demo run seeded above, reusing the "Login regression" and
+// "Checkout smoke" suites' existing cases, so the flaky-test leaderboard has real, varied data to show.
+// created_by is 'flaky seed' (not 'demo seed'), so the original demo run and the report generated from it
+// (matched by created_by = 'demo seed' above) are never touched by this block.
+if (!db.prepare("SELECT 1 FROM app_meta WHERE key = 'flaky_seed_runs_seeded'").get()) {
+  db.transaction(() => {
+    // Inserts one completed run per row of `outcomesByRun`: outcomesByRun[i][j] is the result for cases[j] in
+    // the i-th new run, oldest run first. Each run is spaced a day apart, ending a few hours after it starts.
+    function seedFlakyRuns(suiteName, outcomesByRun) {
+      const suite = db.prepare('SELECT id, name FROM test_suites WHERE name = ? ORDER BY id LIMIT 1').get(suiteName)
+      if (!suite) return
+      const cases = db
+        .prepare(
+          `SELECT t.id, t.title
+           FROM test_suite_cases c JOIN test_cases t ON t.id = c.test_case_id
+           WHERE c.suite_id = ? ORDER BY c.sort_order ASC`
+        )
+        .all(suite.id)
+      if (cases.length === 0) return
+
+      const insertRun = db.prepare(
+        `INSERT INTO test_runs_v2 (suite_id, suite_name, status, pass_count, fail_count, skip_count, start_time, end_time, locked_at, created_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'flaky seed')`
+      )
+      const insertResult = db.prepare(
+        `INSERT INTO test_run_results (run_id, test_case_id, case_title, sort_order, result, recorded_at)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+
+      outcomesByRun.forEach((outcomes, runIndex) => {
+        // Oldest run furthest in the past, most recent run close to (but before) "now", so chronological
+        // ordering by start_time matches array order without relying on insertion order or id order. Kept
+        // inside the last 3 hours (all less than the seed demo run's own "3 hours ago" start_time) so these
+        // runs always sort AFTER that one, not before it - the demo run must stay the oldest/first result.
+        const minutesAgo = (outcomesByRun.length - runIndex) * 30
+        const startedAt = new Date(Date.now() - minutesAgo * 60 * 1000)
+        const start = startedAt.toISOString().slice(0, 19).replace('T', ' ')
+        const end = new Date(startedAt.getTime() + 20 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ')
+
+        const passCount = outcomes.filter((r) => r === 'passed').length
+        const failCount = outcomes.filter((r) => r === 'failed').length
+        const skipCount = outcomes.filter((r) => r === 'skipped').length
+        const status = failCount > 0 ? 'failed' : 'passed'
+
+        const runId = insertRun.run(suite.id, suite.name, status, passCount, failCount, skipCount, start, end, end).lastInsertRowid
+        cases.forEach((testCase, caseIndex) => {
+          const result = outcomes[caseIndex]
+          if (!result) return
+          insertResult.run(runId, testCase.id, testCase.title, caseIndex + 1, result, end)
+        })
+      })
+    }
+
+    // Login regression cases, in sort order: [Successful login, Login blocked, Password reset].
+    // Combined with the existing demo run (passed, failed, skipped), this gives:
+    //   Successful login:  passed, failed, passed, failed, passed -> 4 flips / 4 = 100% (clearly flaky)
+    //   Login blocked:     failed x5 (plus the original)          -> 0 flips      = 0%   (contrast: consistent failure)
+    //   Password reset:    (skipped excluded) passed, passed, failed, passed -> 2 flips / 3 = 67% (moderate)
+    seedFlakyRuns('Login regression', [
+      ['failed', 'failed', 'passed'],
+      ['passed', 'failed', 'passed'],
+      ['failed', 'failed', 'failed'],
+      ['passed', 'failed', 'passed'],
+    ])
+
+    // Checkout smoke cases, in sort order: [Guest checkout, Order total coupon, Empty cart]. This suite has no
+    // runs yet, so these 3 runs are its only history.
+    //   Guest checkout:    passed x3     -> 0 flips      = 0%  (contrast: consistent pass)
+    //   Order total coupon: passed, passed, failed -> 1 flip / 2 = 50% (borderline)
+    //   Empty cart:        passed x3     -> 0 flips      = 0%  (contrast: consistent pass)
+    seedFlakyRuns('Checkout smoke', [
+      ['passed', 'passed', 'passed'],
+      ['passed', 'passed', 'passed'],
+      ['passed', 'failed', 'passed'],
+    ])
+
+    db.prepare("INSERT INTO app_meta (key, value) VALUES ('flaky_seed_runs_seeded', '1')").run()
   })()
 }
 
