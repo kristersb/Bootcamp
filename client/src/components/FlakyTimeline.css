@@ -1,5 +1,6 @@
 .flaky-timeline {
   display: inline-flex;
+  flex-wrap: wrap;
   gap: 0.2rem;
   align-items: center;
 }
@@ -12,9 +13,12 @@
   flex: none;
 }
 
+/* Shape, not just color, carries the result: a colorblind user scanning the row for a pattern has a
+   second cue beyond hue. The per-pill title and the group's aria-label already give the full text. */
 .timeline-pill-passed {
   background: var(--color-pass-bg);
   border: 1px solid var(--color-pass-text);
+  border-radius: 50%;
 }
 
 .timeline-pill-failed {
@@ -25,9 +29,11 @@
 .timeline-pill-skipped {
   background: var(--color-warn-bg);
   border: 1px solid var(--color-warn-text);
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
 .timeline-pill-pending {
   background: var(--color-surface-alt);
-  border: 1px solid var(--color-text-muted);
+  border: 1px dashed var(--color-text-muted);
 }

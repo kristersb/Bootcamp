@@ -13,16 +13,16 @@
 }
 
 .severity-major {
-  background: light-dark(#ffe9cf, #452b0c);
-  color: light-dark(#8a4b05, #f1d3b1);
+  background: var(--color-severity-major-bg);
+  color: var(--color-severity-major-text);
 }
 
 .severity-minor {
-  background: light-dark(#fff6cf, #453a0c);
-  color: light-dark(#7a6304, #f1e5b1);
+  background: var(--color-severity-minor-bg);
+  color: var(--color-severity-minor-text);
 }
 
 .severity-trivial {
-  background: light-dark(#e4f0ff, #0c2645);
-  color: light-dark(#1b4f8c, #b1cff1);
+  background: var(--color-severity-trivial-bg);
+  color: var(--color-severity-trivial-text);
 }

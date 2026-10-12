@@ -39,6 +39,15 @@
   --color-warn-bg: light-dark(#fef3c7, #451a03);
   --color-warn-text: light-dark(#92400e, #fcd34d);
 
+  /* Severity scale (SeverityBadge): a 4-step ordinal scale, distinct from the pass/fail/warn status
+     tokens above - critical reuses --color-fail-bg/text exactly (same hue, same meaning). */
+  --color-severity-major-bg: light-dark(#ffe9cf, #452b0c);
+  --color-severity-major-text: light-dark(#8a4b05, #f1d3b1);
+  --color-severity-minor-bg: light-dark(#fff6cf, #453a0c);
+  --color-severity-minor-text: light-dark(#7a6304, #f1e5b1);
+  --color-severity-trivial-bg: light-dark(#e4f0ff, #0c2645);
+  --color-severity-trivial-text: light-dark(#1b4f8c, #b1cff1);
+
   --radius-lg: 10px;
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
 }
