@@ -5,6 +5,14 @@
   color: var(--color-text-muted);
 }
 
+/* .test-cases-table's generic 48rem min-width was sized for that page's narrower column set. This
+   table's own fixed-width columns (severity 7 + score 5 + flips 4.5 + timeline 8 + hypothesis 22 =
+   46.5rem) already leave almost nothing for the Title column at 48rem, forcing it down to a few
+   pixels wide and wrapping every character onto its own line on narrow viewports. */
+.flaky-tests-table {
+  min-width: 60rem;
+}
+
 .col-flaky-score {
   width: 5rem;
 }

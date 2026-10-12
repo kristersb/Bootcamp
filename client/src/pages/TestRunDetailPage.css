@@ -47,7 +47,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
-  background: light-dark(#eee, #333);
+  background: var(--color-surface-alt);
 }
 
 .result-passed {
@@ -74,7 +74,7 @@
 .result-button {
   min-width: 4.5rem;
   padding: 0.4rem 0.9rem;
-  border: 1px solid light-dark(#bbb, #555);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   background: none;
   color: inherit;
@@ -83,7 +83,7 @@
 }
 
 .result-button:hover:not(:disabled) {
-  background: light-dark(#f2f2f2, #333);
+  background: var(--color-surface-alt);
 }
 
 .result-button:disabled {
