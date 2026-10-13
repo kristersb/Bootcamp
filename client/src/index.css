@@ -61,10 +61,11 @@ body {
 
 /* Below this, the mobile layout (hamburger nav, stacked cards) takes over - see App.css's own
    768px breakpoint. Above it, the desktop/tablet layouts aren't designed to shrink further, so a
-   browser window resized narrower than this shows a horizontal scrollbar instead of breaking. */
+   browser window resized smaller than this shows a scrollbar instead of breaking. */
 @media (min-width: 769px) {
   body {
     min-width: 1024px;
+    min-height: 600px;
   }
 }
 
