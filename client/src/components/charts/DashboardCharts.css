@@ -161,6 +161,12 @@ svg rect[tabindex]:focus-visible {
   font-size: 0.95rem;
 }
 
+/* Each tooltip has 2-3 sibling text lines (strong + one or two spans); without this, adjacent spans
+   render on the same inline line with no separator - e.g. "Run #4" + "12 Oct" reads as "Run #412 Oct". */
+.chart-tooltip span {
+  display: block;
+}
+
 .chart-legend {
   display: flex;
   flex-wrap: wrap;
