@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { runStatusLabel } from '../constants/test-run'
+import { runStatusClass, runStatusLabel } from '../constants/test-run'
 import { getDashboardMetrics, getDashboardTrends } from '../api/dashboard'
 import { describeActivity } from '../utils/describe-activity'
 import { formatDate } from '../utils/format-date'
@@ -262,7 +262,7 @@ function DashboardPage() {
                             {run.pass_count} / {run.fail_count}
                           </td>
                           <td>
-                            <span className="status-pill">{runStatusLabel(run)}</span>
+                            <span className={`status-pill status-pill-${runStatusClass(run)}`}>{runStatusLabel(run)}</span>
                           </td>
                           <td>{formatDate(run.start_time)}</td>
                         </tr>

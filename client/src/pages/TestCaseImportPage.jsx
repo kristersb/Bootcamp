@@ -185,7 +185,9 @@ function TestCaseImportPage() {
                     </td>
                     <td>{summarizeSteps(row.input.steps)}</td>
                     <td>
-                      <span className="status-pill">{row.input.status || 'draft'}</span>
+                      <span className={`status-pill status-pill-${row.input.status || 'draft'}`}>
+                        {row.input.status || 'draft'}
+                      </span>
                     </td>
                     <td>
                       {row.errors.length === 0 ? (

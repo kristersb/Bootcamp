@@ -97,7 +97,7 @@ function TestSuitesPage() {
               </td>
               <td>{suite.feature}</td>
               <td>
-                <span className="status-pill">{suite.status}</span>
+                <span className={`status-pill status-pill-${suite.status}`}>{suite.status}</span>
               </td>
               <td>{suite.case_count}</td>
               <td>{formatDate(suite.updated_at)}</td>

@@ -224,10 +224,10 @@ function BugsPage() {
                   <SeverityBadge severity={bug.severity} />
                 </td>
                 <td>
-                  <span className="status-pill">{bug.priority}</span>
+                  <span className={`status-pill status-pill-${bug.priority}`}>{bug.priority}</span>
                 </td>
                 <td>
-                  <span className="status-pill">{bug.status}</span>
+                  <span className={`status-pill status-pill-${bug.status}`}>{bug.status}</span>
                 </td>
                 <td>{formatDate(bug.updated_at)}</td>
               </tr>

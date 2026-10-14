@@ -171,7 +171,7 @@ function BugDetailPage() {
           <h1>{bug.title}</h1>
           <p className="suite-meta bug-meta">
             <SeverityBadge severity={bug.severity} />
-            <span className="status-pill">{bug.status}</span>
+            <span className={`status-pill status-pill-${bug.status}`}>{bug.status}</span>
             <span>
               Priority: <strong>{bug.priority}</strong>
             </span>

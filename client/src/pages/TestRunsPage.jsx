@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { RUN_STATUSES, runStatusLabel } from '../constants/test-run'
+import { RUN_STATUSES, runStatusClass, runStatusLabel } from '../constants/test-run'
 import { listTestRuns } from '../api/test-runs'
 import { formatDate } from '../utils/format-date'
 import './TestCasesPage.css'
@@ -145,7 +145,7 @@ function TestRunsPage() {
                   <span className="run-number">Run #{run.id}</span>
                 </td>
                 <td>
-                  <span className="status-pill">{runStatusLabel(run)}</span>
+                  <span className={`status-pill status-pill-${runStatusClass(run)}`}>{runStatusLabel(run)}</span>
                 </td>
                 <td>{run.pass_count}</td>
                 <td>{run.fail_count}</td>

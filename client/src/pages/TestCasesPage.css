@@ -196,13 +196,32 @@
   font-size: 0.8rem;
 }
 
-/* Only the outcome statuses get a status color; draft/ready are workflow states, not a pass/fail/warning outcome. */
-.status-pill-passed {
+/* One small set of reserved meanings, reused across every status/priority pill in the app (test case,
+   test suite, test run, bug status, bug priority) rather than a one-off color per field. Values with no
+   rule here (draft, closed, low) intentionally stay the neutral base above - every one of these scales
+   needs a "nothing's happened/nothing urgent yet" baseline, and inventing a 5th color for it would just
+   be noise. */
+.status-pill-ready,
+.status-pill-open {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+}
+
+.status-pill-in-progress,
+.status-pill-medium {
+  background: var(--color-warn-bg);
+  color: var(--color-warn-text);
+}
+
+.status-pill-passed,
+.status-pill-resolved {
   background: var(--color-pass-bg);
   color: var(--color-pass-text);
 }
 
-.status-pill-failed {
+.status-pill-failed,
+.status-pill-reopened,
+.status-pill-high {
   background: var(--color-fail-bg);
   color: var(--color-fail-text);
 }

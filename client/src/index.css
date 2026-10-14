@@ -40,6 +40,11 @@
   --color-fail-text: light-dark(#9f1239, #fda4af);
   --color-warn-bg: light-dark(#fef3c7, #451a03);
   --color-warn-text: light-dark(#92400e, #fcd34d);
+  /* Info: an active/not-yet-resolved workflow state (ready, open) - same cyan hue as the accent, its
+     own dedicated pair rather than reusing --color-severity-trivial-bg/text, which is a different
+     hue meaning a different thing (severity, not status). */
+  --color-info-bg: light-dark(#cffafe, #083344);
+  --color-info-text: light-dark(#155e75, #67e8f9);
 
   /* Severity scale (SeverityBadge): a 4-step ordinal scale, distinct from the pass/fail/warn status
      tokens above - critical reuses --color-fail-bg/text exactly (same hue, same meaning). */

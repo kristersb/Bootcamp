@@ -213,7 +213,7 @@ function TestRunDetailPage() {
             {run.suite_name} <span className="run-number-title">Run #{run.id}</span>
           </h1>
           <p className="suite-meta run-summary">
-            <span className="status-pill">{run.status}</span>
+            <span className={`status-pill status-pill-${run.status}`}>{run.status}</span>
             <span>
               <strong>{run.pass_count}</strong> passed
             </span>

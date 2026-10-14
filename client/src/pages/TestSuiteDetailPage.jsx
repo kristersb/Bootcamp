@@ -174,7 +174,8 @@ function TestSuiteDetailPage() {
         <div>
           <h1>{suite.name}</h1>
           <p className="suite-meta">
-            Feature: <strong>{suite.feature}</strong> · <span className="status-pill">{suite.status}</span> · Updated{' '}
+            Feature: <strong>{suite.feature}</strong> ·{' '}
+            <span className={`status-pill status-pill-${suite.status}`}>{suite.status}</span> · Updated{' '}
             {formatDate(suite.updated_at)}
           </p>
         </div>
@@ -254,7 +255,7 @@ function TestSuiteDetailPage() {
                 <span className="case-position">{index + 1}.</span>
                 <span className="case-title">{testCase.title}</span>
                 <SeverityBadge severity={testCase.severity} />
-                <span className="status-pill">{testCase.status}</span>
+                <span className={`status-pill status-pill-${testCase.status}`}>{testCase.status}</span>
                 <span className="case-controls">
                   <button
                     type="button"
