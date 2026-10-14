@@ -229,9 +229,20 @@ function TestCaseFormModal({ testCase, onClose, onSaved, onStale }) {
                 className="add-list-item"
                 onClick={addPrecondition}
                 disabled={preconditions.length >= LIMITS.preconditions}
+                title={
+                  preconditions.length >= LIMITS.preconditions
+                    ? `You can add up to ${LIMITS.preconditions} preconditions.`
+                    : undefined
+                }
+                aria-describedby={preconditions.length >= LIMITS.preconditions ? id('pre-limit') : undefined}
               >
                 + Add precondition
               </button>
+              {preconditions.length >= LIMITS.preconditions && (
+                <span id={id('pre-limit')} className="field-hint" role="status">
+                  You've reached the limit of {LIMITS.preconditions} preconditions.
+                </span>
+              )}
             </div>
 
             <div className="field" role="group" aria-labelledby={id('steps-label')}>
@@ -270,9 +281,16 @@ function TestCaseFormModal({ testCase, onClose, onSaved, onStale }) {
                 className="add-list-item"
                 onClick={addStep}
                 disabled={steps.length >= LIMITS.steps}
+                title={steps.length >= LIMITS.steps ? `You can add up to ${LIMITS.steps} steps.` : undefined}
+                aria-describedby={steps.length >= LIMITS.steps ? id('steps-limit') : undefined}
               >
                 + Add step
               </button>
+              {steps.length >= LIMITS.steps && (
+                <span id={id('steps-limit')} className="field-hint" role="status">
+                  You've reached the limit of {LIMITS.steps} steps.
+                </span>
+              )}
               {renderError('steps')}
             </div>
 

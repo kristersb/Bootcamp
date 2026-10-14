@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getReport, reportExportUrl } from '../api/reports'
+import { exportReportHtml, getReport } from '../api/reports'
 import { formatDate } from '../utils/format-date'
 import { formatDuration } from '../utils/format-duration'
 import './TestCasesPage.css'
@@ -16,6 +16,8 @@ function ReportDetailPage() {
   const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [exportError, setExportError] = useState('')
+  const [exporting, setExporting] = useState(false)
 
   const load = useCallback(
     () =>
@@ -38,6 +40,18 @@ function ReportDetailPage() {
         <p>Loading...</p>
       </div>
     )
+  }
+
+  async function handleExport() {
+    setExportError('')
+    setExporting(true)
+    try {
+      await exportReportHtml(report.id)
+    } catch (err) {
+      setExportError(`Could not download the HTML report: ${err.message}`)
+    } finally {
+      setExporting(false)
+    }
   }
 
   if (!report) {
@@ -83,14 +97,20 @@ function ReportDetailPage() {
           </p>
         </div>
         <div className="suite-actions no-print">
-          <a className="btn-primary" href={reportExportUrl(report.id)} download>
-            Download HTML
-          </a>
+          <button type="button" className="btn-primary" disabled={exporting} onClick={handleExport}>
+            {exporting ? 'Downloading...' : 'Download HTML'}
+          </button>
           <button type="button" className="btn-secondary" onClick={() => window.print()}>
             Print / Save as PDF
           </button>
         </div>
       </div>
+
+      {exportError && (
+        <p className="form-error no-print" role="alert">
+          {exportError}
+        </p>
+      )}
 
       <table className="test-cases-table report-results-table">
         <caption className="visually-hidden">Test case results</caption>

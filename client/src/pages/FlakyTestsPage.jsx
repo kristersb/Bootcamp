@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getFlakyLeaderboard } from '../api/flaky-tests'
 import SeverityBadge from '../components/SeverityBadge'
-import FlakyTimeline from '../components/FlakyTimeline'
+import FlakyTimeline, { TimelinePill } from '../components/FlakyTimeline'
 import './TestCasesPage.css'
 import './FlakyTestsPage.css'
 
@@ -73,6 +73,23 @@ function FlakyTestsPage() {
             Try again
           </button>
         </div>
+      )}
+
+      {!listError && (
+        <ul className="flaky-timeline-legend" role="list">
+          <li>
+            <TimelinePill result="passed" aria-hidden="true" /> Passed
+          </li>
+          <li>
+            <TimelinePill result="failed" aria-hidden="true" /> Failed
+          </li>
+          <li>
+            <TimelinePill result="skipped" aria-hidden="true" /> Skipped
+          </li>
+          <li>
+            <TimelinePill result="pending" aria-hidden="true" /> Pending
+          </li>
+        </ul>
       )}
 
       {!listError && (

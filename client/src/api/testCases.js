@@ -1,4 +1,4 @@
-import { jsonRequest, request } from './request'
+import { downloadFile, jsonRequest, request } from './request'
 
 const BASE_URL = '/api/test-cases'
 
@@ -14,6 +14,10 @@ export function listTestCases(params) {
 // fetch() call - the browser handles the attachment download/filename itself (see Content-Disposition).
 export function testCaseExportUrl(params) {
   return `${BASE_URL}/export?${buildQuery(params).toString()}`
+}
+
+export function exportTestCases(params) {
+  return downloadFile(testCaseExportUrl(params))
 }
 
 export function createTestCase(payload) {

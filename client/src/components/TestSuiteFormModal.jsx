@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
-import { SUITE_STATUSES } from '../constants/test-suite'
+import { SUITE_STATUSES, TEST_SUITE_LIMITS as LIMITS } from '../constants/test-suite'
 import { createTestSuite, updateTestSuite } from '../api/test-suites'
 import { useSingleFlight } from '../hooks/use-single-flight'
 import { useDialog } from '../hooks/use-dialog'
 import './TestCaseFormModal.css'
 
-function TestSuiteFormModal({ suite, onClose, onSaved }) {
+function TestSuiteFormModal({ suite, onClose, onSaved, onStale }) {
   const isEdit = Boolean(suite)
   const [name, setName] = useState(suite?.name ?? '')
   const [feature, setFeature] = useState(suite?.feature ?? '')
@@ -33,6 +33,7 @@ function TestSuiteFormModal({ suite, onClose, onSaved }) {
     if (Object.keys(errors).length > 0) return
 
     const payload = { name: name.trim(), feature: feature.trim(), status }
+    if (isEdit) payload.version = suite.version
 
     await runOnce(async () => {
       setSaving(true)
@@ -41,7 +42,15 @@ function TestSuiteFormModal({ suite, onClose, onSaved }) {
         onSaved(saved)
         onClose()
       } catch (err) {
-        setSubmitError(err.message)
+        if (err.status === 404) {
+          setSubmitError(
+            'This test suite no longer exists. It was probably deleted in another tab or window. Close this form to see the latest list.'
+          )
+          onStale?.()
+        } else {
+          setSubmitError(err.message)
+          if (err.status === 409) onStale?.()
+        }
       } finally {
         setSaving(false)
       }
@@ -65,6 +74,7 @@ function TestSuiteFormModal({ suite, onClose, onSaved }) {
               ref={nameInputRef}
               type="text"
               value={name}
+              maxLength={LIMITS.name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Login regression"
             />
@@ -76,6 +86,7 @@ function TestSuiteFormModal({ suite, onClose, onSaved }) {
             <input
               type="text"
               value={feature}
+              maxLength={LIMITS.feature}
               onChange={(e) => setFeature(e.target.value)}
               placeholder="What this suite tests, e.g. login"
             />

@@ -58,3 +58,48 @@ the next request). Anything added or changed in the live app - a new bug, an edi
 the next sleep cycle. That's a reasonable trade-off for a free demo/portfolio deployment, but if you need
 the data to actually persist, add a paid [persistent disk](https://render.com/docs/disks) to the service and
 point `DATABASE_PATH` (see `.env.example`) at a path on that disk.
+
+## What this plugin does
+
+This repo also bundles the QA tooling built while developing Strata QA as a Claude Code plugin
+(`.claude-plugin/plugin.json`, `strata-qa-plugin`): slash commands for test cases, bug reports, and daily
+updates; skills and subagents that generate test cases, run QA reviews, summarize QA runs, and analyze
+flaky tests; and hooks that flag API-response-shape and severity-enum violations as soon as code is
+written. It ships in this app's own repo, not a separate plugin repo, so it stays versioned alongside the
+code it was built for.
+
+## Install
+
+**Working in this repo:** nothing to install. Claude Code loads `.claude/commands`, `.claude/agents`,
+`.claude/skills`, and `.claude/hooks` automatically for any session opened in this working directory -
+that's plain project-level config loading, independent of the plugin/marketplace system below.
+
+**Using it from another repo:** this repo isn't published as a plugin marketplace yet - `.claude-plugin/plugin.json`
+exists, but there's no `.claude-plugin/marketplace.json` listing it (that second file, with a `plugins`
+array naming this repo as the source, is required for `/plugin marketplace add` to find it). Once one's
+added, installing it elsewhere would look like:
+
+```
+/plugin marketplace add <owner>/bootcamp-app
+/plugin install strata-qa-plugin@<marketplace-name>
+```
+
+## Examples
+
+Two worked examples of prompts actually typed during this project - what was asked, what Claude did, and
+the result - live under [`examples/`](examples/):
+
+- [`qa-reviewer-bug-tracker-fixes.md`](examples/qa-reviewer-bug-tracker-fixes.md) - dispatching the
+  `qa-reviewer` subagent on the bug tracker and fixing its top 3 findings.
+- [`flaky-test-tracker-plan-and-agent.md`](examples/flaky-test-tracker-plan-and-agent.md) - planning and
+  building the Flaky Test Tracker feature end to end, including the `flake-analyzer` subagent.
+
+## What's inside
+
+- **Commands** (`.claude/commands/`): `bug-report.md`, `daily-update.md`, `new-test.md`
+- **Agents** (`.claude/agents/`): `test-writer.md`, `qa-reviewer.md`, `summary-writer-agent.md`,
+  `flake-analyzer.md`
+- **Skills** (`.claude/skills/`): `test-generator/`, `qa-review/`, `summary-writer/`, `flake-analyzer/`
+- **Hooks** (`.claude/hooks/`): `check-response-shape.sh`, `check-severity-enum.sh`,
+  `check-flaky-after-bash.sh`, `daily-summary-stop.sh` (wired up in `.claude/settings.json`)
+- **License**: [MIT](LICENSE)

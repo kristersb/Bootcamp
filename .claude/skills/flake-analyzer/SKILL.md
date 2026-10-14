@@ -1,3 +1,9 @@
+---
+name: flake-analyzer
+allowed-tools: [Read, Bash]
+description: Write a root-cause hypothesis for a flaky test case and save it via the flaky-hypothesis-cli script, never by editing files directly. Trigger whenever the user asks to "analyze flaky tests", "find out why tests are flaky", "generate root-cause hypotheses", or "update the flaky test insights".
+---
+
 Write a root-cause hypothesis for a flaky test case: a short, plausible explanation for why its result flips between passed and failed, grounded in what the test actually does.
 
 ## What makes a hypothesis grounded, not generic

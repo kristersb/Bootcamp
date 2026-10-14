@@ -42,6 +42,7 @@ function TestRunDetailPage() {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [drafts, setDrafts] = useState({}) // unsaved edits: { [resultId]: { notes?, seconds? } }
+  const [durationErrors, setDurationErrors] = useState({}) // { [resultId]: message }
   const [busy, setBusy] = useState(false)
   const [showComplete, setShowComplete] = useState(false)
   const [completing, setCompleting] = useState(false)
@@ -69,6 +70,12 @@ function TestRunDetailPage() {
 
   function setDraft(result, field, value) {
     setDrafts((current) => ({ ...current, [result.id]: { ...current[result.id], [field]: value } }))
+    if (field === 'seconds' && durationErrors[result.id]) {
+      setDurationErrors((current) => {
+        const { [result.id]: _cleared, ...rest } = current
+        return rest
+      })
+    }
   }
 
   const locked = Boolean(run?.locked_at)
@@ -127,7 +134,10 @@ function TestRunDetailPage() {
   async function save(result, newResult) {
     const seconds = parseSeconds(draftSeconds(result))
     if (!seconds.ok) {
-      setError(`Duration for "${result.case_title}" must be a number of seconds from 0 to ${RUN_LIMITS.maxSeconds}.`)
+      setDurationErrors((current) => ({
+        ...current,
+        [result.id]: `Must be a number of seconds from 0 to ${RUN_LIMITS.maxSeconds}.`,
+      }))
       return
     }
 
@@ -143,6 +153,10 @@ function TestRunDetailPage() {
         setRun(updated)
         setDrafts((current) => {
           const { [result.id]: _saved, ...rest } = current
+          return rest
+        })
+        setDurationErrors((current) => {
+          const { [result.id]: _cleared, ...rest } = current
           return rest
         })
 
@@ -321,8 +335,15 @@ function TestRunDetailPage() {
                     value={draftSeconds(result)}
                     readOnly={locked}
                     disabled={busy}
+                    aria-invalid={Boolean(durationErrors[result.id])}
+                    aria-describedby={durationErrors[result.id] ? `${uid}-seconds-error-${result.id}` : undefined}
                     onChange={(e) => setDraft(result, 'seconds', e.target.value)}
                   />
+                  {durationErrors[result.id] && (
+                    <span id={`${uid}-seconds-error-${result.id}`} className="field-error" role="alert">
+                      {durationErrors[result.id]}
+                    </span>
+                  )}
                 </div>
                 {!locked && (
                   <button type="button" className="btn-secondary" disabled={busy || !dirty} onClick={() => save(result)}>

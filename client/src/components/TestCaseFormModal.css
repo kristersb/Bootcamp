@@ -124,6 +124,12 @@
   font-weight: 400;
 }
 
+.field-hint {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
 .form-error {
   color: var(--color-fail-text);
   font-size: 0.85rem;
@@ -153,11 +159,16 @@
   font: inherit;
   font-weight: 600;
   border: 1px solid transparent;
+  transition: background-color 120ms ease;
 }
 
 .btn-primary {
   background: var(--color-accent-solid);
   color: var(--color-accent-solid-text);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-solid-hover);
 }
 
 .btn-primary:focus-visible,
@@ -175,4 +186,8 @@
   background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-alt);
 }

@@ -26,11 +26,14 @@
   border: 1px solid var(--color-fail-text);
 }
 
+/* An <svg>, not a <span>: see the comment in FlakyTimeline.jsx for why a clipped div can't give this
+   triangle a clean border on all three sides. */
 .timeline-pill-skipped {
-  background: var(--color-warn-bg);
-  border: 1px solid var(--color-warn-text);
   border-radius: 0;
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  fill: var(--color-warn-bg);
+  stroke: var(--color-warn-text);
+  stroke-width: 1px;
+  stroke-linejoin: round;
 }
 
 .timeline-pill-pending {

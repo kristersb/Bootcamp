@@ -69,9 +69,21 @@ function TextListField({
           </button>
         </div>
       ))}
-      <button type="button" className="add-list-item" onClick={add} disabled={values.length >= maxItems}>
+      <button
+        type="button"
+        className="add-list-item"
+        onClick={add}
+        disabled={values.length >= maxItems}
+        title={values.length >= maxItems ? `You can add up to ${maxItems} ${itemLabel.toLowerCase()}s.` : undefined}
+        aria-describedby={values.length >= maxItems ? `${id}-limit` : undefined}
+      >
         + Add {itemLabel.toLowerCase()}
       </button>
+      {values.length >= maxItems && (
+        <span id={`${id}-limit`} className="field-hint" role="status">
+          You've reached the limit of {maxItems} {itemLabel.toLowerCase()}s.
+        </span>
+      )}
       {error && (
         <span id={`${id}-error`} className="field-error" role="alert">
           {error}

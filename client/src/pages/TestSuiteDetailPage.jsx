@@ -100,7 +100,20 @@ function TestSuiteDetailPage() {
   }
 
   async function handleAdd(testCaseId) {
-    setSuite(await withSaveLock(() => addCaseToTestSuite(suite.id, testCaseId)))
+    try {
+      setSuite(await withSaveLock(() => addCaseToTestSuite(suite.id, testCaseId)))
+    } catch (err) {
+      if (err.status === 409) {
+        // Someone else (another tab, another person) already added this case. Refresh so existingIds
+        // picks that up and the picker's button flips to "Added" instead of repeating the same 409.
+        try {
+          setSuite(await getTestSuite(suite.id))
+        } catch {
+          // The message from the failed add is already shown to the user.
+        }
+      }
+      throw err
+    }
   }
 
   // The server copies the suite's cases at this moment, so the run is correct even if this page is out of date.
@@ -280,7 +293,9 @@ function TestSuiteDetailPage() {
         </>
       )}
 
-      {showEdit && <TestSuiteFormModal suite={suite} onClose={() => setShowEdit(false)} onSaved={setSuite} />}
+      {showEdit && (
+        <TestSuiteFormModal suite={suite} onClose={() => setShowEdit(false)} onSaved={setSuite} onStale={load} />
+      )}
 
       {showPicker && (
         <AddCasesModal

@@ -1,4 +1,4 @@
-import { jsonRequest, request } from './request'
+import { downloadFile, jsonRequest, request } from './request'
 
 const BASE_URL = '/api/reports'
 
@@ -16,4 +16,8 @@ export function createReport(runId) {
 
 export function reportExportUrl(id) {
   return `${BASE_URL}/${id}/export/html`
+}
+
+export function exportReportHtml(id) {
+  return downloadFile(reportExportUrl(id))
 }

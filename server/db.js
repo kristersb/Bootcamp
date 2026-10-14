@@ -94,6 +94,12 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_test_suite_cases_order ON test_suite_cases (suite_id, sort_order);
 `)
 
+// Same conflict-detection convention as test_cases.version: lets an editor holding a stale copy be told so,
+// instead of silently overwriting someone else's save.
+if (!db.prepare('PRAGMA table_info(test_suites)').all().some((column) => column.name === 'version')) {
+  db.exec('ALTER TABLE test_suites ADD COLUMN version INTEGER NOT NULL DEFAULT 1')
+}
+
 const insertTestCase = db.prepare(`
   INSERT INTO test_cases (title, preconditions, steps, expected_result, severity, status)
   VALUES (@title, @preconditions, @steps, @expected_result, @severity, @status)

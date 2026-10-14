@@ -5,6 +5,25 @@
   color: var(--color-text-muted);
 }
 
+/* Same shapes as FlakyTimeline's pills, same spec as the dashboard charts' .chart-legend: a visible
+   key is required wherever a result is carried by shape/color, not just a per-pill hover tooltip. */
+.flaky-timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.flaky-timeline-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 /* .test-cases-table's generic 48rem min-width was sized for that page's narrower column set. This
    table's own fixed-width columns (severity 7 + score 5 + flips 4.5 + timeline 8 + hypothesis 22 =
    46.5rem) already leave almost nothing for the Title column at 48rem, forcing it down to a few

@@ -6,6 +6,9 @@ const router = express.Router()
 
 const STATUSES = ['draft', 'ready', 'in-progress', 'passed', 'failed']
 
+// Same convention as testCases.js's LIMITS: enforced here and mirrored client-side (TEST_SUITE_LIMITS).
+const LIMITS = { name: 200, feature: 100 }
+
 const SUITE_WITH_COUNT_SQL = `
   SELECT s.*, (SELECT COUNT(*) FROM test_suite_cases WHERE suite_id = s.id) AS case_count
   FROM test_suites s`
@@ -46,8 +49,18 @@ function validateSuiteInput(body) {
   const errors = []
   const { name, feature, status } = body
 
-  if (typeof name !== 'string' || !name.trim()) errors.push('name is required')
-  if (typeof feature !== 'string' || !feature.trim()) errors.push('feature is required')
+  if (typeof name !== 'string' || !name.trim()) {
+    errors.push('name is required')
+  } else if (name.trim().length > LIMITS.name) {
+    errors.push(`name can be at most ${LIMITS.name} characters`)
+  }
+
+  if (typeof feature !== 'string' || !feature.trim()) {
+    errors.push('feature is required')
+  } else if (feature.trim().length > LIMITS.feature) {
+    errors.push(`feature can be at most ${LIMITS.feature} characters`)
+  }
+
   if (status !== undefined && !STATUSES.includes(status)) errors.push(`status must be one of ${STATUSES.join(', ')}`)
 
   return errors
@@ -88,15 +101,26 @@ function handleCreateTestSuite(req, res) {
 
 function handleUpdateTestSuite(req, res) {
   const id = parseId(req.params.id)
-  if (!id || !findSuite(id)) return sendError(res, 404, 'Test suite not found')
+  const existing = id && findSuite(id)
+  if (!existing) return sendError(res, 404, 'Test suite not found')
 
   const errors = validateSuiteInput(req.body)
   if (errors.length) return sendError(res, 400, errors.join('; '))
 
-  const { name, feature, status = 'draft' } = req.body
+  const { name, feature, status = 'draft', version } = req.body
+
+  // Editors send the version they loaded. If it changed, someone else saved first, so do not overwrite.
+  if (version !== undefined && version !== existing.version) {
+    return sendError(
+      res,
+      409,
+      'This test suite was changed after you opened it. Close the form and open it again to see the latest version.'
+    )
+  }
+
   db.prepare(
     `UPDATE test_suites
-     SET name = @name, feature = @feature, status = @status, updated_at = datetime('now')
+     SET name = @name, feature = @feature, status = @status, updated_at = datetime('now'), version = version + 1
      WHERE id = @id`
   ).run({ id, name: name.trim(), feature: feature.trim(), status })
 

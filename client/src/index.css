@@ -30,6 +30,8 @@
      bright #06b6d4 only clears AA with dark text, which would look wrong painted on a solid button. */
   --color-accent-solid: #0e7490;
   --color-accent-solid-text: #ffffff;
+  /* Fixed for the same reason as --color-accent-solid: a ~20% darken of it, used only on hover. */
+  --color-accent-solid-hover: #0b5d73;
 
   /* Status tokens: light tint + a dark step of the same hue for text, same pattern as the severity badges. */
   --color-pass-bg: light-dark(#d1fae5, #053b2c);

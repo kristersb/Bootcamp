@@ -1,0 +1,9 @@
+{
+  "name": "strata-qa-plugin",
+  "description": "QA toolkit for the Strata QA app: slash commands for test cases, bug reports and daily updates; test-generation, QA-review and summary skills; a flaky-test root-cause analyzer; matching subagents; and hooks that warn on API-envelope and severity-enum violations.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Kristers Berzins",
+    "email": "kristers.berzins@testdevlab.com"
+  }
+}

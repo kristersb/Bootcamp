@@ -30,3 +30,8 @@
   background: #9f1239;
   color: #fff;
 }
+
+.btn-primary.btn-danger-solid:hover:not(:disabled) {
+  /* Same ~20% darken convention as --color-accent-solid-hover, fixed for the same reason. */
+  background: #7f0e2e;
+}

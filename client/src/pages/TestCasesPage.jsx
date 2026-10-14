@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { STATUSES } from '../constants/testCase'
-import { deleteTestCase, listTestCaseSuites, listTestCases, testCaseExportUrl } from '../api/testCases'
+import { deleteTestCase, exportTestCases, listTestCaseSuites, listTestCases } from '../api/testCases'
 import ConfirmDialog from '../components/ConfirmDialog'
 import SeverityBadge from '../components/SeverityBadge'
 import RowActionsMenu from '../components/RowActionsMenu'
@@ -28,6 +28,7 @@ function TestCasesPage() {
   const [pendingDelete, setPendingDelete] = useState(null) // { testCase, suites }
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
+  const [exporting, setExporting] = useState(false)
 
   // Debounce the search box so we don't hit the API on every keystroke.
   useEffect(() => {
@@ -149,6 +150,18 @@ function TestCasesPage() {
     }
   }
 
+  async function handleExport() {
+    setError('')
+    setExporting(true)
+    try {
+      await exportTestCases({ search, status, sort, order })
+    } catch (err) {
+      setError(`Could not download the CSV: ${err.message}`)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const filtersActive = Boolean(search || status)
   const liveMessage = loading
@@ -162,11 +175,9 @@ function TestCasesPage() {
       <div className="test-cases-header">
         <h1>Test Cases</h1>
         <div className="test-cases-header-actions">
-          {/* A plain anchor, not a click handler: the URL itself carries the current filters, and the
-              browser handles the attachment download from the server's Content-Disposition header. */}
-          <a className="btn-secondary" href={testCaseExportUrl({ search, status, sort, order })} download>
-            Download CSV
-          </a>
+          <button type="button" className="btn-secondary" disabled={exporting} onClick={handleExport}>
+            {exporting ? 'Downloading...' : 'Download CSV'}
+          </button>
           <Link to="/test-cases/import" className="btn-secondary">
             Import CSV
           </Link>

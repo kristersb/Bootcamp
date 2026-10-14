@@ -136,6 +136,13 @@
   width: 9rem;
 }
 
+.run-seconds .field-error {
+  display: block;
+  color: var(--color-fail-text);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
 .alert-line {
   margin: 0.6rem 0 0;
   font-size: 0.8rem;
